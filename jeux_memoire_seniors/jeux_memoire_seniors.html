@@ -1,0 +1,1394 @@
+<<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stimule Mémoire - Jeux cognitifs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #1a2a6c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin: 15px 0 25px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            color: #FFD700;
+            text-align: center;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #e0e0ff;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .game-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .game-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+            justify-content: center;
+        }
+        
+        .game-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+        
+        .game-btn.active {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .game-btn i {
+            font-size: 1.8rem;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1000px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-height: 500px;
+            display: none;
+        }
+        
+        .game-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stats {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-width: 180px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to bottom, #66BB6A, #388E3C);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:focus {
+            outline: 3px solid #FFD700;
+        }
+        
+        /* Jeu Memory */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+        
+        .card {
+            aspect-ratio: 1/1;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .card.flipped {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            transform: rotateY(180deg);
+        }
+        
+        .card.matched {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            transform: scale(0.95);
+            cursor: default;
+            box-shadow: 0 0 20px rgba(168, 224, 99, 0.6);
+        }
+        
+        .card-content {
+            font-size: 2.5rem;
+            transform: rotateY(180deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card.flipped .card-content {
+            opacity: 1;
+        }
+        
+        .card.matched .card-content {
+            opacity: 1;
+        }
+        
+        .card-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+        }
+        
+        .question-mark {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: bold;
+        }
+        
+        /* Jeu de Séquence - NOUVEAU DESIGN */
+        .sequence-game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+        }
+        
+        .sequence-display-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .sequence-display {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .sequence-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: default;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .sequence-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .sequence-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .sequence-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .sequence-btn {
+            aspect-ratio: 1/1;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .sequence-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sequence-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .sequence-btn.correct {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            animation: pulse 0.5s;
+        }
+        
+        .sequence-btn.incorrect {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            animation: shake 0.5s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        
+        /* Jeu d'Association - NOUVEAU DESIGN */
+        .association-game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .association-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .association-card {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .association-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .association-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .association-card:hover:before {
+            opacity: 1;
+        }
+        
+        .association-card.selected {
+            border: 3px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .association-card.matched {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            cursor: default;
+            animation: pulse 0.5s;
+        }
+        
+        .association-card.incorrect {
+            animation: shake 0.5s;
+        }
+        
+        .association-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .association-text {
+            font-size: 1.4rem;
+            flex: 1;
+            z-index: 1;
+        }
+        
+        /* Instructions et footer */
+        .instructions {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .instructions h2 {
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+        
+        .instructions-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .instruction-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            width: 220px;
+        }
+        
+        .instruction-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #e0e0ff;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+        
+        /* Messages de victoire */
+        .win-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        .win-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .win-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 500px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            border: 3px solid #FFD700;
+            animation: popIn 0.5s;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .win-content h2 {
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        
+        .win-stats {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        
+        .win-stats span {
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .celebration {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .memory-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .sequence-item, .sequence-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .association-game-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .game-btn {
+                min-width: 180px;
+                font-size: 1.1rem;
+                padding: 12px 20px;
+            }
+            
+            .association-card {
+                min-height: 80px;
+                padding: 15px;
+            }
+            
+            .association-icon {
+                font-size: 2rem;
+            }
+            
+            .association-text {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .memory-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .sequence-item, .sequence-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .game-btn {
+                min-width: 160px;
+                font-size: 1rem;
+            }
+            
+            .sequence-pad {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Stimule Mémoire</h1>
+        <p class="subtitle">Trois jeux pour entraîner votre mémoire de travail et stimuler vos fonctions cognitives</p>
+        
+        <div class="game-selector">
+            <button class="game-btn active" data-game="memory">
+                <i class="fas fa-brain"></i>
+                <span>Jeu de Mémoire</span>
+            </button>
+            <button class="game-btn" data-game="sequence">
+                <i class="fas fa-list-ol"></i>
+                <span>Mémoire de Séquence</span>
+            </button>
+            <button class="game-btn" data-game="association">
+                <i class="fas fa-link"></i>
+                <span>Association d'Idées</span>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Jeu de Mémoire -->
+    <div class="game-container active" id="memory-game">
+        <div class="controls">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="pairs-counter">0</div>
+                    <div class="stat-label">Paires trouvées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="moves-counter">0</div>
+                    <div class="stat-label">Essais</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="timer">00:00</div>
+                    <div class="stat-label">Temps</div>
+                </div>
+            </div>
+            <button id="reset-btn" class="btn pulse">Nouvelle Partie</button>
+        </div>
+        
+        <div class="memory-board" id="game-board">
+            <!-- Cartes générées par JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Jeu de Séquence - NOUVEAU -->
+    <div class="game-container" id="sequence-game">
+        <div class="controls">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="level-counter">1</div>
+                    <div class="stat-label">Niveau</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score-sequence">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="sequence-length">3</div>
+                    <div class="stat-label">Longueur</div>
+                </div>
+            </div>
+            <button id="start-sequence-btn" class="btn pulse">Commencer</button>
+        </div>
+        
+        <div class="sequence-game-container">
+            <div class="sequence-display-container">
+                <div class="sequence-display" id="sequence-display">
+                    <!-- Séquence générée par JavaScript -->
+                </div>
+            </div>
+            
+            <div class="sequence-controls">
+                <div class="sequence-pad" id="sequence-pad">
+                    <!-- Boutons générés par JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Jeu d'Association - AMÉLIORÉ -->
+    <div class="game-container" id="association-game">
+        <div class="controls">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="associations-counter">0</div>
+                    <div class="stat-label">Associations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="attempts-counter">0</div>
+                    <div class="stat-label">Essais</div>
+                </div>
+            </div>
+            <button id="reset-association-btn" class="btn pulse">Recommencer</button>
+        </div>
+        
+        <div class="association-game-container">
+            <div class="association-column" id="column-left">
+                <!-- Cartes de gauche -->
+            </div>
+            
+            <div class="association-column" id="column-right">
+                <!-- Cartes de droite -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h2>Comment utiliser cette application</h2>
+        <p>Choisissez un jeu dans le menu ci-dessus. Chaque jeu stimule différentes fonctions cognitives :</p>
+        
+        <div class="instructions-list">
+            <div class="instruction-item">
+                <div class="instruction-icon"><i class="fas fa-brain"></i></div>
+                <h3>Jeu de Mémoire</h3>
+                <div>Retournez les cartes pour trouver les paires correspondantes. Stimule la mémoire visuelle.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-icon"><i class="fas fa-list-ol"></i></div>
+                <h3>Mémoire de Séquence</h3>
+                <div>Mémorisez et reproduisez la séquence affichée. Améliore la mémoire à court terme.</div>
+            </div>
+            <div class="instruction-item">
+                <div class="instruction-icon"><i class="fas fa-link"></i></div>
+                <h3>Association d'Idées</h3>
+                <div>Associez les éléments logiquement liés. Développe la mémoire sémantique.</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="win-message" id="win-message">
+        <div class="win-content">
+            <div class="celebration">🎉</div>
+            <h2>Félicitations !</h2>
+            <div class="win-stats" id="win-stats">
+                <!-- Détails spécifiques au jeu -->
+            </div>
+            <button id="play-again-btn" class="btn">Rejouer</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Application conçue pour la stimulation cognitive - Utilisez quotidiennement pour entretenir vos fonctions cérébrales</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation entre les jeux
+            const gameButtons = document.querySelectorAll('.game-btn');
+            const gameContainers = document.querySelectorAll('.game-container');
+            const winMessage = document.getElementById('win-message');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            
+            gameButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const gameId = button.dataset.game;
+                    
+                    // Mettre à jour les boutons actifs
+                    gameButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Afficher le jeu sélectionné
+                    gameContainers.forEach(container => {
+                        container.classList.remove('active');
+                        if (container.id === `${gameId}-game`) {
+                            container.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Fermer le message de victoire
+            playAgainBtn.addEventListener('click', () => {
+                winMessage.classList.remove('show');
+            });
+            
+            // Initialiser tous les jeux
+            initMemoryGame();
+            initSequenceGame();
+            initAssociationGame();
+            
+            // ------------------- JEU DE MÉMOIRE -------------------
+            function initMemoryGame() {
+                // Éléments du DOM
+                const gameBoard = document.getElementById('game-board');
+                const resetBtn = document.getElementById('reset-btn');
+                const pairsCounter = document.getElementById('pairs-counter');
+                const movesCounter = document.getElementById('moves-counter');
+                const timerElement = document.getElementById('timer');
+                const winStats = document.getElementById('win-stats');
+                
+                // Configuration du jeu
+                const cardSymbols = ['★', '●', '▲', '■', '♥', '♦', '♣', '♠'];
+                const cardColors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#6A0572', '#1A535C', '#FF9F1C', '#2EC4B6', '#E71D36'];
+                let cards = [];
+                let flippedCards = [];
+                let matchedPairs = 0;
+                let totalMoves = 0;
+                let gameStarted = false;
+                let timerInterval;
+                let seconds = 0;
+                
+                // Initialiser le jeu
+                initGame();
+                
+                // Fonction d'initialisation du jeu
+                function initGame() {
+                    // Réinitialiser les variables
+                    cards = [];
+                    flippedCards = [];
+                    matchedPairs = 0;
+                    totalMoves = 0;
+                    seconds = 0;
+                    gameStarted = false;
+                    
+                    // Mettre à jour l'interface
+                    pairsCounter.textContent = matchedPairs;
+                    movesCounter.textContent = totalMoves;
+                    timerElement.textContent = '00:00';
+                    
+                    // Vider le plateau de jeu
+                    gameBoard.innerHTML = '';
+                    
+                    // Créer les cartes
+                    const allCards = [];
+                    
+                    for (let i = 0; i < cardSymbols.length; i++) {
+                        // Ajouter deux cartes identiques pour former une paire
+                        allCards.push({ symbol: cardSymbols[i], color: cardColors[i] });
+                        allCards.push({ symbol: cardSymbols[i], color: cardColors[i] });
+                    }
+                    
+                    // Mélanger les cartes
+                    shuffleArray(allCards);
+                    
+                    // Créer les éléments cartes dans le DOM
+                    allCards.forEach((card, index) => {
+                        const cardElement = document.createElement('div');
+                        cardElement.classList.add('card');
+                        cardElement.dataset.index = index;
+                        
+                        cardElement.innerHTML = `
+                            <div class="card-front">
+                                <div class="question-mark">?</div>
+                            </div>
+                            <div class="card-content" style="color: ${card.color}">${card.symbol}</div>
+                        `;
+                        
+                        cardElement.addEventListener('click', () => flipCard(cardElement, card));
+                        gameBoard.appendChild(cardElement);
+                        
+                        // Stocker les données de la carte
+                        cards.push({
+                            element: cardElement,
+                            symbol: card.symbol,
+                            color: card.color,
+                            matched: false
+                        });
+                    });
+                }
+                
+                // Fonction pour mélanger un tableau
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+                
+                // Fonction pour retourner une carte
+                function flipCard(cardElement, cardData) {
+                    // Ne pas retourner si la carte est déjà retournée ou appariée
+                    if (cardElement.classList.contains('flipped') || 
+                        cardElement.classList.contains('matched') || 
+                        flippedCards.length === 2) {
+                        return;
+                    }
+                    
+                    // Démarrer le timer au premier clic
+                    if (!gameStarted) {
+                        startTimer();
+                        gameStarted = true;
+                    }
+                    
+                    // Retourner la carte
+                    cardElement.classList.add('flipped');
+                    flippedCards.push(cardElement);
+                    
+                    // Vérifier si deux cartes sont retournées
+                    if (flippedCards.length === 2) {
+                        totalMoves++;
+                        movesCounter.textContent = totalMoves;
+                        
+                        const card1 = cards.find(c => c.element === flippedCards[0]);
+                        const card2 = cards.find(c => c.element === flippedCards[1]);
+                        
+                        // Vérifier si les cartes correspondent
+                        if (card1.symbol === card2.symbol) {
+                            // Cartes correspondent
+                            setTimeout(() => {
+                                flippedCards[0].classList.add('matched');
+                                flippedCards[1].classList.add('matched');
+                                flippedCards = [];
+                                
+                                matchedPairs++;
+                                pairsCounter.textContent = matchedPairs;
+                                
+                                card1.matched = true;
+                                card2.matched = true;
+                                
+                                // Vérifier si le jeu est terminé
+                                if (matchedPairs === cardSymbols.length) {
+                                    endGame();
+                                }
+                            }, 500);
+                        } else {
+                            // Cartes ne correspondent pas
+                            setTimeout(() => {
+                                flippedCards[0].classList.remove('flipped');
+                                flippedCards[1].classList.remove('flipped');
+                                flippedCards = [];
+                            }, 1000);
+                        }
+                    }
+                }
+                
+                // Fonction pour démarrer le timer
+                function startTimer() {
+                    clearInterval(timerInterval);
+                    seconds = 0;
+                    updateTimer();
+                    
+                    timerInterval = setInterval(() => {
+                        seconds++;
+                        updateTimer();
+                    }, 1000);
+                }
+                
+                // Fonction pour mettre à jour l'affichage du timer
+                function updateTimer() {
+                    const minutes = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                
+                // Fonction pour terminer le jeu
+                function endGame() {
+                    clearInterval(timerInterval);
+                    
+                    // Afficher le message de victoire
+                    winStats.innerHTML = `
+                        Vous avez trouvé toutes les paires !<br>
+                        Essais: <span>${totalMoves}</span><br>
+                        Temps: <span>${timerElement.textContent}</span>
+                    `;
+                    winMessage.classList.add('show');
+                }
+                
+                // Événements
+                resetBtn.addEventListener('click', () => {
+                    clearInterval(timerInterval);
+                    winMessage.classList.remove('show');
+                    initGame();
+                });
+            }
+            
+            // ------------------- JEU DE SÉQUENCE - CORRIGÉ ET AMÉLIORÉ -------------------
+            function initSequenceGame() {
+                // Éléments du DOM
+                const sequenceDisplay = document.getElementById('sequence-display');
+                const sequencePad = document.getElementById('sequence-pad');
+                const startBtn = document.getElementById('start-sequence-btn');
+                const levelCounter = document.getElementById('level-counter');
+                const scoreElement = document.getElementById('score-sequence');
+                const lengthElement = document.getElementById('sequence-length');
+                const winStats = document.getElementById('win-stats');
+                
+                // Configuration du jeu
+                const symbols = ['🍎', '🚗', '🏠', '⭐', '🐦', '🌳', '⚽', '📱', '🎵'];
+                let sequence = [];
+                let playerSequence = [];
+                let level = 1;
+                let score = 0;
+                let gameActive = false;
+                let timeoutIds = [];
+                
+                // Initialiser le jeu
+                createPad();
+                
+                // Créer le clavier de jeu
+                function createPad() {
+                    sequencePad.innerHTML = '';
+                    
+                    // Sélectionner 6 symboles aléatoires pour le pad
+                    const padSymbols = [...symbols];
+                    shuffleArray(padSymbols);
+                    const selectedSymbols = padSymbols.slice(0, 6);
+                    
+                    selectedSymbols.forEach((symbol, index) => {
+                        const button = document.createElement('div');
+                        button.classList.add('sequence-btn');
+                        button.textContent = symbol;
+                        button.dataset.index = index;
+                        button.addEventListener('click', () => handlePadClick(index, symbol));
+                        sequencePad.appendChild(button);
+                    });
+                }
+                
+                // Démarrer une nouvelle partie
+                startBtn.addEventListener('click', startGame);
+                
+                function startGame() {
+                    if (gameActive) return;
+                    
+                    // Réinitialiser les variables
+                    sequence = [];
+                    playerSequence = [];
+                    level = 1;
+                    score = 0;
+                    gameActive = true;
+                    
+                    // Mettre à jour l'interface
+                    levelCounter.textContent = level;
+                    scoreElement.textContent = score;
+                    lengthElement.textContent = 3;
+                    sequenceDisplay.innerHTML = '';
+                    
+                    // Démarrer le premier niveau
+                    nextLevel();
+                }
+                
+                function nextLevel() {
+                    playerSequence = [];
+                    
+                    // Générer une nouvelle séquence
+                    const sequenceLength = 2 + level;
+                    sequence = [];
+                    for (let i = 0; i < sequenceLength; i++) {
+                        const randomIndex = Math.floor(Math.random() * 6);
+                        sequence.push(randomIndex);
+                    }
+                    
+                    // Mettre à jour l'interface
+                    lengthElement.textContent = sequenceLength;
+                    
+                    // Afficher la séquence
+                    displaySequence();
+                }
+                
+                function displaySequence() {
+                    // Effacer le display
+                    sequenceDisplay.innerHTML = '';
+                    
+                    // Désactiver les boutons
+                    disablePad();
+                    
+                    let delay = 0;
+                    
+                    sequence.forEach((index, i) => {
+                        // Créer l'élément
+                        const item = document.createElement('div');
+                        item.classList.add('sequence-item');
+                        item.textContent = sequencePad.children[index].textContent;
+                        
+                        // Ajouter au display avec un délai
+                        timeoutIds.push(setTimeout(() => {
+                            sequenceDisplay.appendChild(item);
+                            item.classList.add('visible');
+                            
+                            // Ajouter un effet de pulse
+                            timeoutIds.push(setTimeout(() => {
+                                item.style.transform = 'scale(1.1)';
+                                item.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.7)';
+                            }, 300));
+                            
+                            timeoutIds.push(setTimeout(() => {
+                                item.style.transform = 'scale(1)';
+                                item.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+                            }, 600));
+                            
+                        }, delay));
+                        
+                        delay += 1000; // 1 seconde entre chaque élément
+                    });
+                    
+                    // Activer le clavier après l'affichage
+                    timeoutIds.push(setTimeout(() => {
+                        enablePad();
+                    }, delay + 300));
+                }
+                
+                function handlePadClick(index, symbol) {
+                    if (!gameActive) return;
+                    
+                    // Ajouter le symbole à la séquence du joueur
+                    playerSequence.push(index);
+                    
+                    // Mettre en évidence le bouton cliqué
+                    const button = sequencePad.querySelector(`[data-index="${index}"]`);
+                    
+                    // Vérifier la séquence
+                    const currentIndex = playerSequence.length - 1;
+                    
+                    if (playerSequence[currentIndex] === sequence[currentIndex]) {
+                        // Bonne réponse
+                        button.classList.add('correct');
+                        setTimeout(() => button.classList.remove('correct'), 500);
+                        
+                        // Vérifier si la séquence est complète
+                        if (playerSequence.length === sequence.length) {
+                            // Niveau complété
+                            score += level * 10;
+                            scoreElement.textContent = score;
+                            
+                            // Passer au niveau suivant
+                            level++;
+                            levelCounter.textContent = level;
+                            
+                            // Attendre un peu avant le prochain niveau
+                            setTimeout(() => {
+                                if (level <= 6) {
+                                    nextLevel();
+                                } else {
+                                    // Fin du jeu
+                                    endGame();
+                                }
+                            }, 1000);
+                        }
+                    } else {
+                        // Mauvaise réponse
+                        button.classList.add('incorrect');
+                        setTimeout(() => button.classList.remove('incorrect'), 500);
+                        
+                        // Fin du jeu
+                        endGame();
+                    }
+                }
+                
+                function enablePad() {
+                    const buttons = sequencePad.querySelectorAll('.sequence-btn');
+                    buttons.forEach(button => {
+                        button.style.cursor = 'pointer';
+                        button.style.opacity = '1';
+                    });
+                }
+                
+                function disablePad() {
+                    const buttons = sequencePad.querySelectorAll('.sequence-btn');
+                    buttons.forEach(button => {
+                        button.style.cursor = 'default';
+                        button.style.opacity = '0.7';
+                    });
+                }
+                
+                function endGame() {
+                    gameActive = false;
+                    disablePad();
+                    
+                    // Afficher le message de victoire
+                    winStats.innerHTML = `
+                        Niveau atteint: <span>${level}</span><br>
+                        Score: <span>${score}</span>
+                    `;
+                    winMessage.classList.add('show');
+                    
+                    // Effacer les timeouts
+                    timeoutIds.forEach(id => clearTimeout(id));
+                    timeoutIds = [];
+                }
+            }
+            
+            // ------------------- JEU D'ASSOCIATION - AMÉLIORÉ -------------------
+            function initAssociationGame() {
+                // Éléments du DOM
+                const columnLeft = document.getElementById('column-left');
+                const columnRight = document.getElementById('column-right');
+                const resetBtn = document.getElementById('reset-association-btn');
+                const associationsCounter = document.getElementById('associations-counter');
+                const attemptsCounter = document.getElementById('attempts-counter');
+                const winStats = document.getElementById('win-stats');
+                
+                // Configuration du jeu - plus de paires et plus dynamique
+                const associations = [
+                    { left: { icon: '🐶', text: 'Chien' }, right: { icon: '🦴', text: 'Os' } },
+                    { left: { icon: '🐱', text: 'Chat' }, right: { icon: '🐟', text: 'Poisson' } },
+                    { left: { icon: '🐝', text: 'Abeille' }, right: { icon: '🌸', text: 'Fleur' } },
+                    { left: { icon: '☕', text: 'Café' }, right: { icon: '🍪', text: 'Biscuit' } },
+                    { left: { icon: '🌧️', text: 'Pluie' }, right: { icon: '☔', text: 'Parapluie' } },
+                    { left: { icon: '📚', text: 'Livre' }, right: { icon: '👓', text: 'Lunettes' } },
+                    { left: { icon: '❄️', text: 'Neige' }, right: { icon: '⛄', text: 'Bonhomme' } },
+                    { left: { icon: '✏️', text: 'Crayon' }, right: { icon: '📝', text: 'Papier' } },
+                    { left: { icon: '🌙', text: 'Lune' }, right: { icon: '🌠', text: 'Étoile' } },
+                    { left: { icon: '🍕', text: 'Pizza' }, right: { icon: '🧀', text: 'Fromage' } }
+                ];
+                
+                let selectedCard = null;
+                let matchedPairs = 0;
+                let totalAttempts = 0;
+                let gameCards = [];
+                
+                // Initialiser le jeu
+                initGame();
+                
+                function initGame() {
+                    // Réinitialiser les variables
+                    selectedCard = null;
+                    matchedPairs = 0;
+                    totalAttempts = 0;
+                    
+                    // Mettre à jour l'interface
+                    associationsCounter.textContent = matchedPairs;
+                    attemptsCounter.textContent = totalAttempts;
+                    
+                    // Vider les colonnes
+                    columnLeft.innerHTML = '';
+                    columnRight.innerHTML = '';
+                    
+                    // Sélectionner 5 paires aléatoires
+                    let selectedPairs = [...associations];
+                    shuffleArray(selectedPairs);
+                    selectedPairs = selectedPairs.slice(0, 5);
+                    
+                    // Créer les cartes de gauche
+                    selectedPairs.forEach((pair, index) => {
+                        const card = createCard(pair.left, 'left', index);
+                        columnLeft.appendChild(card);
+                        gameCards.push({
+                            element: card,
+                            pairId: index,
+                            side: 'left',
+                            matched: false
+                        });
+                    });
+                    
+                    // Créer les cartes de droite (mélangées)
+                    const rightCards = selectedPairs.map((pair, index) => ({
+                        data: pair.right,
+                        pairId: index
+                    }));
+                    shuffleArray(rightCards);
+                    
+                    rightCards.forEach(item => {
+                        const card = createCard(item.data, 'right', item.pairId);
+                        columnRight.appendChild(card);
+                        gameCards.push({
+                            element: card,
+                            pairId: item.pairId,
+                            side: 'right',
+                            matched: false
+                        });
+                    });
+                }
+                
+                function createCard(data, side, pairId) {
+                    const card = document.createElement('div');
+                    card.classList.add('association-card');
+                    card.dataset.side = side;
+                    card.dataset.pairId = pairId;
+                    
+                    card.innerHTML = `
+                        <div class="association-icon">${data.icon}</div>
+                        <div class="association-text">${data.text}</div>
+                    `;
+                    
+                    card.addEventListener('click', () => handleCardClick(card, pairId));
+                    return card;
+                }
+                
+                function handleCardClick(card, pairId) {
+                    // Ne pas gérer les cartes déjà associées
+                    if (card.classList.contains('matched')) return;
+                    
+                    // Si aucune carte n'est sélectionnée
+                    if (!selectedCard) {
+                        selectedCard = card;
+                        card.classList.add('selected');
+                        return;
+                    }
+                    
+                    // Si on clique sur la même carte
+                    if (selectedCard === card) {
+                        selectedCard.classList.remove('selected');
+                        selectedCard = null;
+                        return;
+                    }
+                    
+                    // Deux cartes sélectionnées
+                    totalAttempts++;
+                    attemptsCounter.textContent = totalAttempts;
+                    
+                    const firstCard = selectedCard;
+                    const secondCard = card;
+                    
+                    // Vérifier si les cartes forment une paire
+                    if (firstCard.dataset.pairId === secondCard.dataset.pairId && 
+                        firstCard.dataset.side !== secondCard.dataset.side) {
+                        
+                        // Bonne association
+                        firstCard.classList.add('matched');
+                        secondCard.classList.add('matched');
+                        
+                        // Marquer comme associées
+                        gameCards.forEach(gameCard => {
+                            if (gameCard.pairId == firstCard.dataset.pairId) {
+                                gameCard.matched = true;
+                            }
+                        });
+                        
+                        matchedPairs++;
+                        associationsCounter.textContent = matchedPairs;
+                        
+                        // Vérifier si le jeu est terminé
+                        if (matchedPairs === 5) {
+                            endGame();
+                        }
+                    } else {
+                        // Mauvaise association - animation d'erreur
+                        firstCard.classList.add('incorrect');
+                        secondCard.classList.add('incorrect');
+                        
+                        setTimeout(() => {
+                            firstCard.classList.remove('incorrect');
+                            secondCard.classList.remove('incorrect');
+                            firstCard.classList.remove('selected');
+                            selectedCard = null;
+                        }, 1000);
+                    }
+                    
+                    // Réinitialiser la sélection
+                    selectedCard.classList.remove('selected');
+                    selectedCard = null;
+                }
+                
+                function endGame() {
+                    winStats.innerHTML = `
+                        Toutes les associations sont trouvées !<br>
+                        Nombre d'essais: <span>${totalAttempts}</span>
+                    `;
+                    winMessage.classList.add('show');
+                }
+                
+                // Événements
+                resetBtn.addEventListener('click', initGame);
+            }
+            
+            // Fonction utilitaire pour mélanger un tableau
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+        });
+    </script>
+</body>
+</html>

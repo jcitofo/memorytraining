@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroJeux - Memory Training App</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .app {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .touch-manipulation {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+        
+        // Simple icon components using emojis
+        const Brain = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🧠</span>;
+        const RotateCcw = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🔄</span>;
+        const Trophy = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🏆</span>;
+        const Star = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>⭐</span>;
+        const Play = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>▶️</span>;
+        const Home = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🏠</span>;
+        const Zap = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>⚡</span>;
+        const Target = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🎯</span>;
+        const Award = ({ size, className }) => <span className={className} style={{fontSize: size + 'px'}}>🏅</span>;
+
+        const MemoryApp = () => {
+          const [currentGame, setCurrentGame] = useState('menu');
+          const [totalScore, setTotalScore] = useState(0);
+          const [gameHistory, setGameHistory] = useState([]);
+
+          // Jeu de Séquence de Couleurs
+          const ColorSequenceGame = () => {
+            const [sequence, setSequence] = useState([]);
+            const [playerSequence, setPlayerSequence] = useState([]);
+            const [isShowing, setIsShowing] = useState(false);
+            const [activeColor, setActiveColor] = useState(null);
+            const [gameStarted, setGameStarted] = useState(false);
+            const [score, setScore] = useState(0);
+            const [message, setMessage] = useState('');
+            const [gamePhase, setGamePhase] = useState('start');
+
+            const colors = [
+              { id: 'red', name: 'Rouge', bg: 'linear-gradient(135deg, #ff6b6b, #ee5a52)', active: 'linear-gradient(135deg, #ff5252, #d32f2f)', shadow: 'rgba(255, 107, 107, 0.4)' },
+              { id: 'blue', name: 'Bleu', bg: 'linear-gradient(135deg, #4ecdc4, #26a69a)', active: 'linear-gradient(135deg, #26a69a, #00796b)', shadow: 'rgba(78, 205, 196, 0.4)' },
+              { id: 'green', name: 'Vert', bg: 'linear-gradient(135deg, #95e1d3, #66bb6a)', active: 'linear-gradient(135deg, #66bb6a, #388e3c)', shadow: 'rgba(149, 225, 211, 0.4)' },
+              { id: 'yellow', name: 'Jaune', bg: 'linear-gradient(135deg, #ffd93d, #ffb74d)', active: 'linear-gradient(135deg, #ffb74d, #f57c00)', shadow: 'rgba(255, 217, 61, 0.4)' }
+            ];
+
+            const startNewRound = () => {
+              const newColor = colors[Math.floor(Math.random() * colors.length)].id;
+              const newSequence = [...sequence, newColor];
+              setSequence(newSequence);
+              setPlayerSequence([]);
+              setGamePhase('showing');
+              setMessage(`Séquence ${newSequence.length}: Concentrez-vous ! ✨`);
+              showSequence(newSequence);
+            };
+
+            const showSequence = (seq) => {
+              setIsShowing(true);
+              let index = 0;
+
+              const showNext = () => {
+                if (index < seq.length) {
+                  setActiveColor(seq[index]);
+                  setTimeout(() => {
+                    setActiveColor(null);
+                    setTimeout(() => {
+                      index++;
+                      showNext();
+                    }, 300);
+                  }, 700);
+                } else {
+                  setIsShowing(false);
+                  setGamePhase('playing');
+                  setMessage('À vous ! Touchez les couleurs dans le bon ordre 🎯');
+                }
+              };
+
+              setTimeout(showNext, 800);
+            };
+
+            const handleColorClick = (colorId) => {
+              if (isShowing || gamePhase !== 'playing') return;
+
+              const newPlayerSequence = [...playerSequence, colorId];
+              setPlayerSequence(newPlayerSequence);
+
+              if (colorId !== sequence[newPlayerSequence.length - 1]) {
+                setGamePhase('error');
+                setMessage('Pas tout à fait... Réessayez ! 💪');
+                setTimeout(() => {
+                  setPlayerSequence([]);
+                  setGamePhase('playing');
+                  setMessage('Nouvelle tentative ! Vous pouvez y arriver ! 🌟');
+                }, 1500);
+                return;
+              }
+
+              if (newPlayerSequence.length === sequence.length) {
+                const points = sequence.length * 15;
+                setScore(score + points);
+                setGamePhase('success');
+                setMessage(`Fantastique ! +${points} points 🎉`);
+                
+                setTimeout(() => {
+                  startNewRound();
+                }, 2200);
+              }
+            };
+
+            const resetGame = () => {
+              setSequence([]);
+              setPlayerSequence([]);
+              setScore(0);
+              setGameStarted(false);
+              setMessage('');
+              setIsShowing(false);
+              setActiveColor(null);
+              setGamePhase('start');
+            };
+
+            const startGame = () => {
+              setGameStarted(true);
+              setSequence([]);
+              setPlayerSequence([]);
+              setScore(0);
+              startNewRound();
+            };
+
+            const getColorStyle = (color) => {
+              const isActive = activeColor === color.id;
+              const isPlayerTurn = gamePhase === 'playing';
+              const wasClicked = playerSequence.includes(color.id);
+              
+              return {
+                background: isActive ? color.active : color.bg,
+                transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                boxShadow: isActive ? `0 8px 25px ${color.shadow}, 0 0 0 3px rgba(255,255,255,0.8)` : 
+                           wasClicked && isPlayerTurn ? `0 4px 15px ${color.shadow}` : '0 4px 12px rgba(0,0,0,0.15)',
+                opacity: (!isPlayerTurn && !isActive) ? 0.6 : 1,
+                border: wasClicked && isPlayerTurn ? '3px solid rgba(255,255,255,0.9)' : 'none'
+              };
+            };
+
+            return (
+              <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-white via-purple-50 to-blue-50 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <div className="mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4">
+                      <Zap className="text-white" size={28} />
+                    </div>
+                  </div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+                    Séquence de Couleurs
+                  </h2>
+                  <p className="text-gray-600 text-lg">Mémorisez et reproduisez la séquence magique</p>
+                  <div className="mt-6 inline-flex items-center gap-4 bg-white/70 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="text-yellow-500" size={20} />
+                      <span className="text-xl font-bold text-gray-800">{score}</span>
+                    </div>
+                    {sequence.length > 0 && (
+                      <>
+                        <div className="w-px h-6 bg-gray-300"></div>
+                        <div className="flex items-center gap-2">
+                          <Target className="text-blue-500" size={18} />
+                          <span className="text-sm font-medium text-gray-600">
+                            {playerSequence.length}/{sequence.length}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {!gameStarted ? (
+                  <div className="text-center space-y-6">
+                    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                      <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                        🎨 Regardez les couleurs s'illuminer dans l'ordre, puis reproduisez la séquence en touchant les boutons colorés.
+                      </p>
+                    </div>
+                    <button
+                      onClick={startGame}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 active:scale-95 text-white px-10 py-5 rounded-2xl text-xl font-bold flex items-center mx-auto gap-3 shadow-xl transition-all duration-200 hover:shadow-2xl touch-manipulation"
+                    >
+                      <Play size={28} />
+                      Commencer l'aventure
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                      {colors.map((color) => (
+                        <button
+                          key={color.id}
+                          onClick={() => handleColorClick(color.id)}
+                          disabled={isShowing}
+                          className="h-32 rounded-3xl font-bold text-white text-xl transition-all duration-300 touch-manipulation active:scale-95 hover:shadow-2xl"
+                          style={getColorStyle(color)}
+                        >
+                          {color.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    {message && (
+                      <div className={`text-center text-lg font-semibold p-5 rounded-2xl mb-6 backdrop-blur-sm shadow-lg transition-all duration-300 ${
+                        gamePhase === 'success' ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' :
+                        gamePhase === 'error' ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200' :
+                        'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border border-blue-200'
+                      }`}>
+                        {message}
+                      </div>
+                    )}
+
+                    <div className="flex justify-center gap-4">
+                      <button
+                        onClick={resetGame}
+                        className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                      >
+                        <RotateCcw size={22} />
+                        Nouveau Jeu
+                      </button>
+                      <button
+                        onClick={() => setCurrentGame('menu')}
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                      >
+                        <Home size={22} />
+                        Menu
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          };
+
+          // Jeu de Cartes Mémoire
+          const MemoryCardsGame = () => {
+            const [cards, setCards] = useState([]);
+            const [flipped, setFlipped] = useState([]);
+            const [matched, setMatched] = useState([]);
+            const [moves, setMoves] = useState(0);
+            const [score, setScore] = useState(0);
+            const [gameWon, setGameWon] = useState(false);
+
+            const symbols = ['🌟', '🎨', '🎭', '🎪', '🎸', '🎯', '🎲', '🎳'];
+
+            const initializeGame = () => {
+              const gameCards = [...symbols, ...symbols]
+                .map((symbol, index) => ({ id: index, symbol, isFlipped: false, isMatched: false }))
+                .sort(() => Math.random() - 0.5);
+              
+              setCards(gameCards);
+              setFlipped([]);
+              setMatched([]);
+              setMoves(0);
+              setScore(0);
+              setGameWon(false);
+            };
+
+            useEffect(() => {
+              initializeGame();
+            }, []);
+
+            const handleCardClick = (cardId) => {
+              if (flipped.length === 2 || flipped.includes(cardId) || matched.includes(cardId)) {
+                return;
+              }
+
+              const newFlipped = [...flipped, cardId];
+              setFlipped(newFlipped);
+
+              if (newFlipped.length === 2) {
+                setMoves(moves + 1);
+                
+                const [first, second] = newFlipped;
+                const firstCard = cards.find(c => c.id === first);
+                const secondCard = cards.find(c => c.id === second);
+
+                if (firstCard.symbol === secondCard.symbol) {
+                  setTimeout(() => {
+                    setMatched([...matched, first, second]);
+                    setFlipped([]);
+                    setScore(score + 75);
+                    
+                    if (matched.length + 2 === cards.length) {
+                      setGameWon(true);
+                    }
+                  }, 1000);
+                } else {
+                  setTimeout(() => {
+                    setFlipped([]);
+                  }, 1000);
+                }
+              }
+            };
+
+            return (
+              <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-white via-green-50 to-blue-50 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <div className="mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mb-4">
+                      <Star className="text-white" size={28} />
+                    </div>
+                  </div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-3">
+                    Jeu de Mémoire
+                  </h2>
+                  <p className="text-gray-600 text-lg">Trouvez toutes les paires cachées</p>
+                  <div className="mt-6 flex justify-center gap-6">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+                      <Trophy className="text-yellow-500" size={20} />
+                      <span className="text-lg font-bold text-gray-800">{score}</span>
+                    </div>
+                    <div className="bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+                      <Target className="text-blue-500" size={20} />
+                      <span className="text-lg font-bold text-gray-800">{moves}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {gameWon && (
+                  <div className="text-center mb-8 p-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl shadow-lg border border-green-200">
+                    <div className="text-3xl mb-2">🎉</div>
+                    <div className="text-2xl font-bold text-green-800 mb-2">Incroyable !</div>
+                    <div className="text-green-700 text-lg">Terminé en {moves} coups ! Vous êtes un champion ! 🏆</div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-4 gap-4 mb-8">
+                  {cards.map((card) => (
+                    <div
+                      key={card.id}
+                      onClick={() => handleCardClick(card.id)}
+                      className={`aspect-square rounded-2xl cursor-pointer flex items-center justify-center text-3xl transition-all duration-500 touch-manipulation active:scale-95 shadow-lg ${
+                        flipped.includes(card.id) || matched.includes(card.id)
+                          ? 'bg-gradient-to-br from-white to-gray-50 border-2 border-teal-300 shadow-xl transform rotate-y-180'
+                          : 'bg-gradient-to-br from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 shadow-lg hover:shadow-xl text-white hover:scale-105'
+                      }`}
+                    >
+                      {(flipped.includes(card.id) || matched.includes(card.id)) ? card.symbol : '✨'}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center flex justify-center gap-4">
+                  <button
+                    onClick={initializeGame}
+                    className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                  >
+                    <RotateCcw size={22} />
+                    Nouvelle Partie
+                  </button>
+                  <button
+                    onClick={() => setCurrentGame('menu')}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                  >
+                    <Home size={22} />
+                    Menu
+                  </button>
+                </div>
+              </div>
+            );
+          };
+
+          // Jeu de Nombres
+          const NumberSequenceGame = () => {
+            const [sequence, setSequence] = useState([]);
+            const [userInput, setUserInput] = useState('');
+            const [currentLevel, setCurrentLevel] = useState(1);
+            const [score, setScore] = useState(0);
+            const [showSequence, setShowSequence] = useState(false);
+            const [gamePhase, setGamePhase] = useState('start');
+            const [message, setMessage] = useState('');
+
+            const generateSequence = (length) => {
+              return Array.from({ length }, () => Math.floor(Math.random() * 10));
+            };
+
+            const startNewRound = () => {
+              const newSequence = generateSequence(currentLevel + 2);
+              setSequence(newSequence);
+              setUserInput('');
+              setMessage(`Niveau ${currentLevel}: Mémorisez ces chiffres ! 🔢`);
+              setGamePhase('showing');
+              setShowSequence(true);
+
+              setTimeout(() => {
+                setShowSequence(false);
+                setGamePhase('input');
+                setMessage('Tapez la séquence que vous avez vue 📝');
+              }, (currentLevel + 2) * 900 + 1200);
+            };
+
+            const checkAnswer = () => {
+              const userSequence = userInput.split('').map(Number);
+              const isCorrect = userSequence.length === sequence.length && 
+                               userSequence.every((num, index) => num === sequence[index]);
+
+              if (isCorrect) {
+                const points = currentLevel * 25;
+                setScore(score + points);
+                setCurrentLevel(currentLevel + 1);
+                setMessage(`Extraordinaire ! +${points} points ⭐ Niveau suivant...`);
+                setGamePhase('result');
+                setTimeout(() => {
+                  startNewRound();
+                }, 2500);
+              } else {
+                setMessage(`Presque ! La séquence était : ${sequence.join('')} 💪 Réessayez !`);
+                setGamePhase('result');
+              }
+            };
+
+            const resetGame = () => {
+              setCurrentLevel(1);
+              setScore(0);
+              setUserInput('');
+              setSequence([]);
+              setGamePhase('start');
+              setMessage('');
+            };
+
+            return (
+              <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-white via-orange-50 to-yellow-50 rounded-3xl shadow-2xl border border-white/20 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <div className="mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full mb-4">
+                      <Award className="text-white" size={28} />
+                    </div>
+                  </div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent mb-3">
+                    Séquence de Nombres
+                  </h2>
+                  <p className="text-gray-600 text-lg">Retenez les chiffres magiques</p>
+                  <div className="mt-6 flex justify-center gap-6">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+                      <Trophy className="text-yellow-500" size={20} />
+                      <span className="text-lg font-bold text-gray-800">{score}</span>
+                    </div>
+                    <div className="bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+                      <Zap className="text-orange-500" size={20} />
+                      <span className="text-lg font-bold text-gray-800">Niv. {currentLevel}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {gamePhase === 'start' && (
+                  <div className="text-center space-y-6">
+                    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                      <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                        🔢 Des chiffres vont apparaître brièvement. Mémorisez-les et retapez la séquence exacte !
+                      </p>
+                    </div>
+                    <button
+                      onClick={startNewRound}
+                      className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 active:scale-95 text-white px-10 py-5 rounded-2xl text-xl font-bold flex items-center mx-auto gap-3 shadow-xl transition-all duration-200 hover:shadow-2xl touch-manipulation"
+                    >
+                      <Play size={28} />
+                      Commencer le défi
+                    </button>
+                  </div>
+                )}
+
+                {gamePhase === 'showing' && (
+                  <div className="text-center py-12">
+                    <div className="bg-gradient-to-r from-orange-100 to-yellow-100 rounded-3xl p-8 shadow-2xl border border-orange-200 mb-6">
+                      <div className="text-7xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent tracking-wider">
+                        {showSequence ? sequence.join(' ') : ''}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {gamePhase === 'input' && (
+                  <div className="text-center space-y-6">
+                    <input
+                      type="text"
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="text-5xl text-center border-3 border-orange-300 rounded-2xl p-6 bg-white/80 backdrop-blur-sm shadow-lg focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-200 transition-all duration-200 w-full max-w-md"
+                      placeholder="123..."
+                      maxLength={sequence.length}
+                    />
+                    <button
+                      onClick={checkAnswer}
+                      disabled={userInput.length !== sequence.length}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-300 disabled:to-gray-400 active:scale-95 text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-lg transition-all duration-200 touch-manipulation"
+                    >
+                      ✓ Vérifier
+                    </button>
+                  </div>
+                )}
+
+                {message && (
+                  <div className={`text-center text-lg font-semibold p-5 rounded-2xl mb-6 backdrop-blur-sm shadow-lg ${
+                    gamePhase === 'result' && score > 0 ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' :
+                    'bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 border border-orange-200'
+                  }`}>
+                    {message}
+                  </div>
+                )}
+
+                {gamePhase !== 'start' && (
+                  <div className="text-center mt-8 flex justify-center gap-4">
+                    <button
+                      onClick={resetGame}
+                      className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                    >
+                      <RotateCcw size={22} />
+                      Recommencer
+                    </button>
+                    <button
+                      onClick={() => setCurrentGame('menu')}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 active:scale-95 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg transition-all duration-200 touch-manipulation font-semibold"
+                    >
+                      <Home size={22} />
+                      Menu
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          };
+
+          // Menu principal
+          const MainMenu = () => {
+            const games = [
+              { 
+                id: 'colors', 
+                title: 'Séquence de Couleurs', 
+                description: 'Mémorisez les motifs colorés', 
+                icon: '🎨', 
+                gradient: 'from-purple-500 to-pink-500',
+                bgGradient: 'from-purple-50 to-pink-50',
+                borderColor: 'border-purple-200'
+              },
+              { 
+                id: 'cards', 
+                title: 'Jeu de Mémoire', 
+                description: 'Trouvez toutes les paires', 
+                icon: '✨', 
+                gradient: 'from-green-500 to-teal-500',
+                bgGradient: 'from-green-50 to-teal-50',
+                borderColor: 'border-green-200'
+              },
+              { 
+                id: 'numbers', 
+                title: 'Séquence de Nombres', 
+                description: 'Retenez les chiffres magiques', 
+                icon: '🔢', 
+                gradient: 'from-orange-500 to-yellow-500',
+                bgGradient: 'from-orange-50 to-yellow-50',
+                borderColor: 'border-orange-200'
+              }
+            ];
+
+            return (
+              <div className="max-w-5xl mx-auto p-6">
+                <div className="text-center mb-12">
+                  <div className="flex items-center justify-center gap-4 mb-6">
+                    <div className="relative">
+                      <div className="w-20 h-20 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl">
+                        <Brain size={48} className="text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                        <Star size={16} className="text-yellow-700" />
+                      </div>
+                    </div>
+                    <div>
+                      <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        NeuroJeux
+                      </h1>
+                      <p className="text-xl text-gray-600 mt-2">Entraînement cognitif ludique</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-3xl p-6 shadow-lg border border-white/50 backdrop-blur-sm mb-8">
+                    <p className="text-lg text-gray-700 leading-relaxed">
+                      🧠 Stimulez votre mémoire avec des exercices amusants et progressifs, conçus pour renforcer vos capacités cognitives au quotidien.
+                    </p>
+                  </div>
+                  
+                  {totalScore > 0 && (
+                    <div className="inline-block bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-6 shadow-xl border border-yellow-200 mb-8">
+                      <div className="flex items-center gap-3 text-yellow-800">
+                        <Trophy size={32} className="text-yellow-600" />
+                        <div>
+                          <div className="text-sm font-medium text-yellow-700">Score Total</div>
+                          <div className="text-3xl font-bold text-yellow-800">{totalScore}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8">
+                  {games.map((game) => (
+                    <div
+                      key={game.id}
+                      onClick={() => setCurrentGame(game.id)}
+                      className={`group bg-gradient-to-br ${game.bgGradient} rounded-3xl shadow-xl p-8 cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 ${game.borderColor} hover:shadow-2xl backdrop-blur-sm touch-manipulation active:scale-95 relative overflow-hidden`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative text-center">
+                        <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300">
+                          {game.icon}
+                        </div>
+                        <h3 className={`text-2xl font-bold bg-gradient-to-r ${game.gradient} bg-clip-text text-transparent mb-3`}>
+                          {game.title}
+                        </h3>
+                        <p className="text-gray-600 mb-6 text-lg leading-relaxed">{game.description}</p>
+                        <button className={`bg-gradient-to-r ${game.gradient} hover:shadow-xl text-white px-8 py-4 rounded-2xl font-bold text-lg w-full transition-all duration-200 shadow-lg`}>
+                          🚀 Jouer
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-12 text-center">
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                    <p className="text-gray-600 text-lg">
+                      💫 <span className="font-semibold">Conseil :</span> Pratiquez 10-15 minutes par jour pour des résultats optimaux !
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+
+          const renderCurrentGame = () => {
+            switch (currentGame) {
+              case 'colors':
+                return <ColorSequenceGame />;
+              case 'cards':
+                return <MemoryCardsGame />;
+              case 'numbers':
+                return <NumberSequenceGame />;
+              default:
+                return <MainMenu />;
+            }
+          };
+
+          return (
+            <div className="app">
+              {renderCurrentGame()}
+            </div>
+          );
+        };
+
+        ReactDOM.render(<MemoryApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

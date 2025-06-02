@@ -3,296 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeux de Mémoire pour Seniors</title>
+    <title>Entraînement Mémoire - Jeux Cognitifs Accessibles</title>
     <style>
-        /* Variables et reset */
+        /* Variables CSS pour la cohérence des couleurs */
         :root {
-            --primary: #6a11cb;
-            --secondary: #2575fc;
-            --success: #00c9a7;
-            --warning: #ff9e44;
-            --danger: #ff3860;
-            --light: #f8f9fc;
-            --dark: #2c3e50;
-            --font-large: 24px;
-            --font-xlarge: 32px;
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #45B7D1;
+            --success: #96CEB4;
+            --warning: #FFEAA7;
+            --info: #74B9FF;
+            --light: #F8F9FA;
+            --dark: #2D3436;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 8px 25px rgba(0,0,0,0.15);
+            --shadow-hover: 0 12px 35px rgba(0,0,0,0.25);
+            --border-radius: 20px;
+            --font-size-base: 18px;
+            --font-size-large: 24px;
+            --font-size-xlarge: 32px;
+            --font-size-title: 28px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
+        /* Reset et base */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            line-height: 1.6;
         }
-        
+
         /* Conteneur principal */
-        .container {
+        .app-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background: white;
-            border-radius: 25px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        /* En-tête */
-        header {
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, #ff6b6b 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: var(--font-xlarge);
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             position: relative;
         }
-        
-        header::before {
+
+        /* Header avec animations */
+        .app-header {
+            background: var(--gradient-card);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
+            left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%);
-            background-size: 20px 20px;
-            animation: headerShine 3s ease-in-out infinite;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
         }
-        
-        @keyframes headerShine {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.1; }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
-        
-        /* Sections de jeu */
-        section {
-            width: 100%;
-            padding: 30px;
+
+        .app-title {
+            font-size: var(--font-size-xlarge);
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .app-subtitle {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Navigation et sections */
+        .game-section {
             display: none;
-            flex-direction: column;
-            align-items: center;
+            padding: 40px 30px;
+            text-align: center;
+            min-height: 500px;
         }
-        
-        .active {
-            display: flex;
+
+        .game-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        
-        /* Menu principal */
-        #menu-principal {
-            display: flex;
-            flex-direction: column;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: var(--font-size-title);
+            color: var(--dark);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* Système de statistiques et scores */
+        .stats-container {
+            background: linear-gradient(135deg, var(--light) 0%, #e3f2fd 100%);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        /* Boutons */
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-large);
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--dark);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Boutons avec animations améliorées */
         .btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
+            display: inline-block;
+            padding: 18px 35px;
+            margin: 10px;
             border: none;
             border-radius: 50px;
-            padding: 20px 40px;
-            font-size: var(--font-large);
+            font-size: var(--font-size-base);
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            min-width: 250px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            text-decoration: none;
             position: relative;
             overflow: hidden;
+            min-width: 200px;
+            text-align: center;
+            outline: none;
         }
-        
-        .btn:before {
+
+        .btn::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
-            transition: all 0.3s;
-            opacity: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
         }
-        
-        .btn:hover, .btn:focus {
+
+        .btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-primary {
+            background: var(--gradient-card);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            outline: none;
+            box-shadow: var(--shadow-hover);
         }
-        
-        .btn:hover:before {
-            opacity: 1;
+
+        .btn-secondary {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: var(--shadow);
         }
-        
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fdcb6e 100%);
+            color: var(--dark);
+            box-shadow: var(--shadow);
+        }
+
         .btn-reset {
-            background: linear-gradient(135deg, var(--warning) 0%, #ff6b6b 100%);
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
             margin-top: 20px;
         }
-        
-        /* Affichage du score */
-        .score {
-            font-size: var(--font-xlarge);
-            margin: 20px 0;
-            color: var(--dark);
-            font-weight: bold;
-        }
-        
-        /* Grille de cartes */
-        .grille-cartes {
+
+        /* Grilles de jeu adaptatives */
+        .game-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
-            margin: 20px 0;
+            margin: 30px auto;
+            justify-content: center;
+        }
+
+        .memory-grid {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 400px;
+        }
+
+        .simon-grid {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 300px;
+        }
+
+        .sequence-grid {
+            grid-template-columns: repeat(5, 1fr);
             max-width: 500px;
         }
-        
-        .carte {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-            cursor: pointer;
-            transition: all 0.3s;
-            transform-style: preserve-3d;
-            box-shadow: 0 8px 15px rgba(106, 17, 203, 0.3);
-            color: white;
-            font-weight: bold;
-        }
-        
-        .carte:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 20px rgba(106, 17, 203, 0.4);
-        }
-        
-        .carte.retournee {
-            transform: rotateY(180deg);
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border: 3px solid var(--primary);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-        
-        /* Boutons Simon */
-        .grille-simon {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin: 30px 0;
-        }
-        
-        .btn-simon {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-        
-        .btn-simon:active {
-            transform: scale(0.95);
-        }
-        
-        .btn-simon[data-couleur="rouge"] { 
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-            box-shadow: 0 8px 15px rgba(255, 107, 107, 0.4);
-        }
-        .btn-simon[data-couleur="bleu"] { 
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            box-shadow: 0 8px 15px rgba(78, 115, 223, 0.4);
-        }
-        .btn-simon[data-couleur="vert"] { 
-            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-            box-shadow: 0 8px 15px rgba(28, 200, 138, 0.4);
-        }
-        .btn-simon[data-couleur="jaune"] { 
-            background: linear-gradient(135deg, #f6c23e 0%, #f39c12 100%);
-            box-shadow: 0 8px 15px rgba(246, 194, 62, 0.4);
-        }
-        
-        .btn-simon.active {
-            opacity: 0.7;
-            transform: scale(0.95);
-        }
-        
-        /* Objets */
-        .grille-objets {
-            display: grid;
+
+        .object-grid {
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 30px 0;
+            max-width: 360px;
         }
-        
-        .objet {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            border: 2px solid #e9ecef;
-            transition: all 0.3s;
-        }
-        
-        .objet:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
-        }
-        
-        .btn-objet {
+
+        /* Cartes de mémoire */
+        .memory-card {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--light) 0%, #e9ecef 100%);
-            border-radius: 15px;
+            border-radius: var(--border-radius);
+            background: var(--gradient-card);
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 30px;
+            justify-content: center;
+            font-size: 35px;
             cursor: pointer;
-            border: 2px solid var(--secondary);
+            transition: var(--transition);
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .memory-card.flipped {
+            background: white;
+            border: 3px solid var(--primary);
+            transform: rotateY(180deg);
+        }
+
+        .memory-card:hover:not(.flipped) {
+            transform: scale(1.05) rotateY(10deg);
+        }
+
+        /* Boutons Simon avec effets visuels */
+        .simon-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .simon-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
-        .btn-objet:hover {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+
+        .simon-btn:hover::after {
+            width: 100%;
+            height: 100%;
+        }
+
+        .simon-btn.active {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .simon-red { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .simon-blue { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); }
+        .simon-green { background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%); }
+        .simon-yellow { background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%); }
+
+        /* Séquences de nombres */
+        .sequence-item {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--border-radius);
+            background: var(--gradient-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-large);
+            font-weight: 700;
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.3);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
         }
-        
-        /* Message de feedback */
+
+        .sequence-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .sequence-item.highlighted {
+            background: var(--gradient-card);
+            transform: scale(1.1);
+        }
+
+        /* Objets du jeu de disparition */
+        .object-item {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--border-radius);
+            background: white;
+            border: 3px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .object-item.selectable {
+            cursor: pointer;
+        }
+
+        .object-item.selectable:hover {
+            background: var(--secondary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Messages de feedback améliorés */
         .feedback {
-            font-size: var(--font-large);
-            margin: 20px 0;
-            min-height: 40px;
-            text-align: center;
-            font-weight: bold;
+            font-size: var(--font-size-large);
+            margin: 25px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, var(--success) 0%, #81c784 100%);
+            color: white;
+            animation: pulse 1s;
+        }
+
+        .feedback.encouragement {
+            background: linear-gradient(135deg, var(--info) 0%, #42a5f5 100%);
+            color: white;
+        }
+
+        .feedback.neutral {
+            background: var(--light);
             color: var(--dark);
         }
-        
-        /* Accessibilité */
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Accessibilité renforcée */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -301,538 +407,981 @@
             margin: -1px;
             overflow: hidden;
             clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
             border: 0;
         }
-        
-        /* Responsive */
-        @media (max-width: 600px) {
-            .grille-cartes {
+
+        .focus-visible:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Instructions claires */
+        .instructions {
+            background: rgba(116, 185, 255, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        /* Responsive design optimisé */
+        @media (max-width: 768px) {
+            .app-container {
+                margin: 10px;
+            }
+            
+            .game-section {
+                padding: 30px 20px;
+            }
+            
+            .memory-grid {
                 grid-template-columns: repeat(3, 1fr);
+                max-width: 300px;
             }
             
-            .btn {
-                min-width: 200px;
-                padding: 15px 30px;
+            .memory-card {
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
             }
             
-            .btn-simon {
+            .simon-btn {
                 width: 100px;
                 height: 100px;
             }
             
-            .grille-objets {
+            .btn {
+                min-width: 180px;
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            .object-grid {
                 grid-template-columns: repeat(2, 1fr);
+                max-width: 240px;
+            }
+            
+            .sequence-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 300px;
+            }
+        }
+
+        /* Indicateurs de progression */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Animations de confettis pour les succès */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            Entraînement Mémoire
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">🧠 Entraînement Mémoire</h1>
+            <p class="app-subtitle">Jeux cognitifs adaptés et bienveillants</p>
         </header>
-        
-        <!-- Menu principal -->
-        <section id="menu-principal" class="active">
-            <h1 class="sr-only">Menu principal</h1>
-            <button class="btn" onclick="changerJeu('memo-visuel')">Mémo Visuel</button>
-            <button class="btn" onclick="changerJeu('suite-sonore')">Suite Sonore</button>
-            <button class="btn" onclick="changerJeu('objet-disparu')">Objet Disparu</button>
-        </section>
-        
-        <!-- Jeu 1 - Mémo visuel -->
-        <section id="memo-visuel">
-            <h2>Mémo Visuel</h2>
-            <div class="score">Essais: <span id="score-memo">0</span></div>
-            <div class="grille-cartes" id="grille-memo"></div>
-            <div class="feedback" id="feedback-memo"></div>
-            <button class="btn btn-reset" onclick="initialiserMemo()">Recommencer</button>
-            <button class="btn" onclick="changerJeu('menu-principal')">Retour au menu</button>
-        </section>
-        
-        <!-- Jeu 2 - Suite sonore -->
-        <section id="suite-sonore">
-            <h2>Suite Sonore</h2>
-            <div class="score">Séquence: <span id="score-simon">0</span></div>
-            <div id="audio-activation" style="margin: 20px 0; text-align: center;">
-                <button class="btn" onclick="activerSon()" id="btn-activer-son">🔊 Activer le Son</button>
-                <p style="font-size: 14px; color: #666; margin-top: 10px;">Cliquez pour activer l'audio</p>
+
+        <!-- Statistiques globales -->
+        <section id="global-stats" class="game-section active">
+            <h2 class="section-title">Tableau de Bord</h2>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-games">0</span>
+                    <div class="stat-label">Parties jouées</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-memory-score">0</span>
+                    <div class="stat-label">Meilleur score - Mémoire</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-simon-score">0</span>
+                    <div class="stat-label">Meilleur score - Simon</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-sequence-score">0</span>
+                    <div class="stat-label">Meilleur score - Séquence</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-objects-score">0</span>
+                    <div class="stat-label">Meilleur score - Objets</div>
+                </div>
             </div>
-            <div class="grille-simon">
-                <button class="btn-simon" data-couleur="rouge" onclick="verifierSequence('rouge')"></button>
-                <button class="btn-simon" data-couleur="bleu" onclick="verifierSequence('bleu')"></button>
-                <button class="btn-simon" data-couleur="vert" onclick="verifierSequence('vert')"></button>
-                <button class="btn-simon" data-couleur="jaune" onclick="verifierSequence('jaune')"></button>
+
+            <div class="instructions">
+                <strong>Bienvenue !</strong><br>
+                Choisissez un jeu ci-dessous pour commencer votre entraînement mémoire. 
+                Chaque jeu est conçu pour être amusant et stimulant, sans jamais être frustrant.
             </div>
-            <div class="feedback" id="feedback-simon"></div>
-            <button class="btn btn-reset" onclick="initialiserSimon()">Recommencer</button>
-            <button class="btn" onclick="changerJeu('menu-principal')">Retour au menu</button>
+
+            <button class="btn btn-primary" onclick="showGame('memory-game')">
+                🃏 Jeu de Mémoire Visuelle
+            </button>
+            <button class="btn btn-primary" onclick="showGame('simon-game')">
+                🎵 Simon Musical
+            </button>
+            <button class="btn btn-primary" onclick="showGame('sequence-game')">
+                🔢 Séquences Numériques
+            </button>
+            <button class="btn btn-primary" onclick="showGame('objects-game')">
+                👁️ Objet Disparu
+            </button>
+            
+            <button class="btn btn-reset" onclick="resetAllData()">
+                🔄 Remise à Zéro Complète
+            </button>
         </section>
-        
-        <!-- Jeu 3 - Objet disparu -->
-        <section id="objet-disparu">
-            <h2>Objet Disparu</h2>
-            <div class="score">Bonnes réponses: <span id="score-objet">0</span></div>
-            <div class="grille-objets" id="grille-objets"></div>
-            <div class="feedback" id="feedback-objet"></div>
-            <div id="selection-objets" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;"></div>
-            <button class="btn btn-reset" onclick="initialiserObjet()">Recommencer</button>
-            <button class="btn" onclick="changerJeu('menu-principal')">Retour au menu</button>
+
+        <!-- Jeu 1: Mémoire Visuelle -->
+        <section id="memory-game" class="game-section">
+            <h2 class="section-title">🃏 Jeu de Mémoire Visuelle</h2>
+            
+            <div class="instructions">
+                Trouvez toutes les paires en retournant les cartes. Prenez votre temps !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="memory-attempts">0</span>
+                    <div class="stat-label">Tentatives</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="memory-pairs">0</span>
+                    <div class="stat-label">Paires trouvées</div>
+                </div>
+            </div>
+
+            <div class="game-grid memory-grid" id="memory-grid"></div>
+            
+            <div class="feedback neutral" id="memory-feedback">
+                Retournez deux cartes pour commencer !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initMemoryGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 2: Simon Musical -->
+        <section id="simon-game" class="game-section">
+            <h2 class="section-title">🎵 Simon Musical</h2>
+            
+            <div class="instructions">
+                Écoutez et reproduisez la séquence de couleurs et de sons !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="simon-level">0</span>
+                    <div class="stat-label">Niveau actuel</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="simon-streak">0</span>
+                    <div class="stat-label">Séquences réussies</div>
+                </div>
+            </div>
+
+            <div class="game-grid simon-grid" id="simon-grid">
+                <button class="simon-btn simon-red" data-color="red" onclick="playerSequence('red')"></button>
+                <button class="simon-btn simon-blue" data-color="blue" onclick="playerSequence('blue')"></button>
+                <button class="simon-btn simon-green" data-color="green" onclick="playerSequence('green')"></button>
+                <button class="simon-btn simon-yellow" data-color="yellow" onclick="playerSequence('yellow')"></button>
+            </div>
+            
+            <div class="feedback neutral" id="simon-feedback">
+                Prêt à commencer ? Cliquez sur "Nouvelle Partie" !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initSimonGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 3: Séquences Numériques -->
+        <section id="sequence-game" class="game-section">
+            <h2 class="section-title">🔢 Séquences Numériques</h2>
+            
+            <div class="instructions">
+                Mémorisez la séquence de nombres qui s'affiche, puis cliquez dans le bon ordre !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="sequence-level">1</span>
+                    <div class="stat-label">Niveau</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="sequence-score">0</span>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <div class="game-grid sequence-grid" id="sequence-grid"></div>
+            
+            <div class="feedback neutral" id="sequence-feedback">
+                Observez bien la séquence qui va s'afficher !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initSequenceGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 4: Objet Disparu -->
+        <section id="objects-game" class="game-section">
+            <h2 class="section-title">👁️ Objet Disparu</h2>
+            
+            <div class="instructions">
+                Mémorisez les objets affichés, puis trouvez celui qui a disparu !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="objects-round">1</span>
+                    <div class="stat-label">Manche</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="objects-score">0</span>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <div class="game-grid object-grid" id="objects-grid"></div>
+            
+            <div class="feedback neutral" id="objects-feedback">
+                Mémorisez bien tous les objets...
+            </div>
+
+            <div class="game-grid object-grid" id="objects-choices" style="display: none;"></div>
+
+            <button class="btn btn-secondary" onclick="initObjectsGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
         </section>
     </div>
 
     <script>
-        // ==================================================================
-        // FONCTIONS GÉNÉRALES
-        // ==================================================================
-        
-        /**
-         * Change le jeu actif
-         * @param {string} jeuId - ID de la section du jeu à afficher
-         */
-        function changerJeu(jeuId) {
-            // Initialiser l'audio dès la première interaction
-            initialiserAudio();
-            
+        // =============================================
+        // GESTION DES DONNÉES ET STATISTIQUES
+        // =============================================
+
+        class GameStats {
+            constructor() {
+                this.loadStats();
+            }
+
+            loadStats() {
+                const saved = localStorage.getItem('memoryGameStats');
+                if (saved) {
+                    Object.assign(this, JSON.parse(saved));
+                } else {
+                    this.totalGames = 0;
+                    this.memoryGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.simonGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.sequenceGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.objectsGame = { bestScore: 0, gamesPlayed: 0 };
+                }
+                this.updateDisplay();
+            }
+
+            saveStats() {
+                localStorage.setItem('memoryGameStats', JSON.stringify(this));
+                this.updateDisplay();
+            }
+
+            updateBestScore(game, score) {
+                if (score > this[game].bestScore) {
+                    this[game].bestScore = score;
+                    this.saveStats();
+                    return true; // Nouveau record
+                }
+                return false;
+            }
+
+            incrementGames(game) {
+                this[game].gamesPlayed++;
+                this.totalGames++;
+                this.saveStats();
+            }
+
+            updateDisplay() {
+                document.getElementById('total-games').textContent = this.totalGames;
+                document.getElementById('best-memory-score').textContent = this.memoryGame.bestScore;
+                document.getElementById('best-simon-score').textContent = this.simonGame.bestScore;
+                document.getElementById('best-sequence-score').textContent = this.sequenceGame.bestScore;
+                document.getElementById('best-objects-score').textContent = this.objectsGame.bestScore;
+            }
+
+            reset() {
+                localStorage.removeItem('memoryGameStats');
+                this.loadStats();
+            }
+        }
+
+        // Instance globale des statistiques
+        const gameStats = new GameStats();
+
+        // =============================================
+        // GESTION DES SONS
+        // =============================================
+
+        class AudioManager {
+            constructor() {
+                this.audioContext = null;
+                this.initAudio();
+            }
+
+            async initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio non supporté');
+                }
+            }
+
+            playTone(frequency, duration = 0.5) {
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.value = frequency;
+                gainNode.gain.value = 0.3;
+
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, this.audioContext.currentTime + duration);
+                
+                setTimeout(() => oscillator.stop(), duration * 1000);
+            }
+
+            playSuccess() {
+                this.playTone(523.25, 0.3); // C5
+                setTimeout(() => this.playTone(659.25, 0.3), 150); // E5
+                setTimeout(() => this.playTone(783.99, 0.5), 300); // G5
+            }
+
+            playError() {
+                this.playTone(200, 0.8);
+            }
+
+            playSimonTone(color) {
+                const frequencies = {
+                    red: 329.63,    // E4
+                    blue: 261.63,   // C4
+                    green: 392.00,  // G4
+                    yellow: 523.25  // C5
+                };
+                this.playTone(frequencies[color], 0.6);
+            }
+        }
+
+        const audioManager = new AudioManager();
+
+        // =============================================
+        // FONCTIONS UTILITAIRES
+        // =============================================
+
+        function showGame(gameId) {
             // Cacher toutes les sections
-            document.querySelectorAll('section').forEach(section => {
+            document.querySelectorAll('.game-section').forEach(section => {
                 section.classList.remove('active');
             });
             
             // Afficher la section demandée
-            document.getElementById(jeuId).classList.add('active');
+            document.getElementById(gameId).classList.add('active');
             
             // Initialiser le jeu si nécessaire
-            if(jeuId === 'memo-visuel') initialiserMemo();
-            if(jeuId === 'suite-sonore') {
-                initialiserAudio(); // S'assurer que l'audio est prêt pour Simon
-                initialiserSimon();
-            }
-            if(jeuId === 'objet-disparu') initialiserObjet();
+            if (gameId === 'memory-game') initMemoryGame();
+            if (gameId === 'simon-game') initSimonGame();
+            if (gameId === 'sequence-game') initSequenceGame();
+            if (gameId === 'objects-game') initObjectsGame();
         }
-        
-        // Créer un contexte audio pour les sons
-        let audioContext = null;
-        
-        // Initialiser le contexte audio après interaction utilisateur
-        function initialiserAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+
+        function resetAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes vos statistiques et recommencer à zéro ?')) {
+                gameStats.reset();
+                showFeedback('Toutes les données ont été effacées. Bon entraînement !', 'encouragement');
             }
         }
-        
-        /**
-         * Active explicitement le son après interaction utilisateur
-         */
-        function activerSon() {
-            initialiserAudio();
-            
-            // Test audio pour confirmer que ça fonctionne
-            if (audioContext) {
-                try {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.type = 'sine';
-                    oscillator.frequency.value = 440; // La 440Hz
-                    gainNode.gain.value = 0.1;
-                    
-                    oscillator.start();
-                    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
-                    
-                    setTimeout(() => {
-                        oscillator.stop();
-                    }, 300);
-                    
-                    // Cacher le bouton d'activation et afficher confirmation
-                    document.getElementById('audio-activation').style.display = 'none';
-                    document.getElementById('feedback-simon').textContent = '🔊 Son activé ! Préparez-vous...';
-                    
-                } catch (error) {
-                    console.log('Erreur activation audio:', error);
-                    document.getElementById('feedback-simon').textContent = 'Erreur audio, mais le jeu reste jouable';
-                }
+
+        function showFeedback(message, type = 'neutral') {
+            // Fonction utilitaire pour afficher des messages avec style
+            const feedback = document.querySelector('.game-section.active .feedback');
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.className = `feedback ${type}`;
             }
         }
-        
-        /**
-         * Joue un son pour le jeu Simon
-         * @param {string} couleur - Couleur pour laquelle jouer le son
-         */
-        function jouerTone(couleur) {
-            // Initialiser l'audio si nécessaire
-            initialiserAudio();
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.innerHTML = '🎉';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.animation = 'confetti-fall linear forwards';
+            document.body.appendChild(confetti);
             
-            if (!audioContext) return;
-            
-            const frequences = {
-                rouge: 329.63,   // E4
-                bleu: 261.63,    // C4
-                vert: 392.00,    // G4
-                jaune: 523.25     // C5
-            };
-            
-            try {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.type = 'sine';
-                oscillator.frequency.value = frequences[couleur];
-                gainNode.gain.value = 0.3;
-                
-                oscillator.start();
-                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
-                
-                setTimeout(() => {
-                    oscillator.stop();
-                }, 500);
-            } catch (error) {
-                console.log('Erreur audio:', error);
-            }
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
         }
-        
-        // ==================================================================
-        // JEU 1 - MÉMO VISUEL
-        // ==================================================================
-        
-        let cartes = [];
-        let cartesRetournees = [];
-        let verrouillage = false;
-        let essais = 0;
-        let pairesTrouvees = 0;
-        
-        // Symboles pour les cartes (paires)
-        const symboles = ['🍎', '🍌', '🍒', '🍑', '🍇', '🍊', '🥝', '🍓'];
-        
-        /**
-         * Initialise le jeu de mémoire
-         */
-        function initialiserMemo() {
-            const grille = document.getElementById('grille-memo');
-            grille.innerHTML = '';
-            cartes = [];
-            cartesRetournees = [];
-            verrouillage = false;
-            essais = 0;
-            pairesTrouvees = 0;
+
+        // =============================================
+        // JEU 1: MÉMOIRE VISUELLE
+        // =============================================
+
+        let memoryGame = {
+            cards: [],
+            flippedCards: [],
+            locked: false,
+            attempts: 0,
+            pairs: 0,
+            symbols: ['🍎', '🍌', '🍒', '🍑', '🍇', '🍊', '🥝', '🍓']
+        };
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
             
-            document.getElementById('score-memo').textContent = essais;
-            document.getElementById('feedback-memo').textContent = '';
+            memoryGame.cards = [];
+            memoryGame.flippedCards = [];
+            memoryGame.locked = false;
+            memoryGame.attempts = 0;
+            memoryGame.pairs = 0;
+            
+            updateMemoryDisplay();
+            showFeedback('Retournez deux cartes pour commencer !', 'neutral');
             
             // Créer les paires de symboles
-            let symbolesJeu = [...symboles, ...symboles];
-            
-            // Mélanger les symboles
-            symbolesJeu.sort(() => Math.random() - 0.5);
+            let gameSymbols = [...memoryGame.symbols, ...memoryGame.symbols];
+            gameSymbols.sort(() => Math.random() - 0.5);
             
             // Créer les cartes
-            symbolesJeu.forEach((symbole, index) => {
-                const carte = document.createElement('div');
-                carte.classList.add('carte');
-                carte.dataset.symbole = symbole;
-                carte.dataset.index = index;
-                carte.innerHTML = `<span aria-hidden="true">?</span>`;
-                carte.addEventListener('click', retournerCarte);
-                grille.appendChild(carte);
-                cartes.push(carte);
+            gameSymbols.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.innerHTML = '?';
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+                memoryGame.cards.push(card);
             });
         }
-        
-        /**
-         * Gère le retournement d'une carte
-         */
-        function retournerCarte() {
-            if(verrouillage) return;
-            if(this === cartesRetournees[0]) return;
+
+        function flipCard() {
+            if (memoryGame.locked || this === memoryGame.flippedCards[0] || this.classList.contains('flipped')) return;
             
-            this.classList.add('retournee');
-            this.innerHTML = `<span aria-hidden="true">${this.dataset.symbole}</span>`;
-            cartesRetournees.push(this);
+            this.classList.add('flipped');
+            this.innerHTML = this.dataset.symbol;
+            memoryGame.flippedCards.push(this);
             
-            if(cartesRetournees.length === 2) {
-                verrouillage = true;
-                essais++;
-                document.getElementById('score-memo').textContent = essais;
+            if (memoryGame.flippedCards.length === 2) {
+                memoryGame.locked = true;
+                memoryGame.attempts++;
+                updateMemoryDisplay();
                 
-                if(cartesRetournees[0].dataset.symbole === cartesRetournees[1].dataset.symbole) {
+                if (memoryGame.flippedCards[0].dataset.symbol === memoryGame.flippedCards[1].dataset.symbol) {
                     // Paire trouvée
-                    cartesRetournees[0].removeEventListener('click', retournerCarte);
-                    cartesRetournees[1].removeEventListener('click', retournerCarte);
-                    cartesRetournees = [];
-                    verrouillage = false;
-                    pairesTrouvees++;
+                    memoryGame.flippedCards[0].removeEventListener('click', flipCard);
+                    memoryGame.flippedCards[1].removeEventListener('click', flipCard);
+                    memoryGame.flippedCards = [];
+                    memoryGame.locked = false;
+                    memoryGame.pairs++;
+                    updateMemoryDisplay();
                     
-                    if(pairesTrouvees === symboles.length) {
-                        document.getElementById('feedback-memo').textContent = 'Bravo ! Vous avez trouvé toutes les paires !';
+                    audioManager.playSuccess();
+                    
+                    if (memoryGame.pairs === memoryGame.symbols.length) {
+                        // Jeu terminé
+                        const score = Math.max(0, 100 - memoryGame.attempts * 5);
+                        gameStats.incrementGames('memoryGame');
+                        const isNewRecord = gameStats.updateBestScore('memoryGame', score);
+                        
+                        showFeedback(`🎉 Bravo ! Toutes les paires trouvées en ${memoryGame.attempts} tentatives !`, 'success');
+                        
+                        if (isNewRecord) {
+                            setTimeout(() => {
+                                showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                                createConfetti();
+                            }, 2000);
+                        }
+                    } else {
+                        showFeedback('✨ Excellente paire ! Continuez !', 'success');
                     }
                 } else {
                     // Pas une paire
                     setTimeout(() => {
-                        cartesRetournees[0].classList.remove('retournee');
-                        cartesRetournees[1].classList.remove('retournee');
-                        cartesRetournees[0].innerHTML = `<span aria-hidden="true">?</span>`;
-                        cartesRetournees[1].innerHTML = `<span aria-hidden="true">?</span>`;
-                        cartesRetournees = [];
-                        verrouillage = false;
+                        memoryGame.flippedCards[0].classList.remove('flipped');
+                        memoryGame.flippedCards[1].classList.remove('flipped');
+                        memoryGame.flippedCards[0].innerHTML = '?';
+                        memoryGame.flippedCards[1].innerHTML = '?';
+                        memoryGame.flippedCards = [];
+                        memoryGame.locked = false;
+                        showFeedback('Pas tout à fait ! Essayez encore.', 'encouragement');
                     }, 1000);
                 }
             }
         }
-        
-        // ==================================================================
-        // JEU 2 - SUITE SONORE
-        // ==================================================================
-        
-        let sequence = [];
-        let sequenceJoueur = [];
-        let peutJouer = false;
-        let niveau = 0;
-        let enSequence = false;
-        
-        /**
-         * Initialise le jeu Simon
-         */
-        function initialiserSimon() {
-            sequence = [];
-            sequenceJoueur = [];
-            peutJouer = false;
-            niveau = 0;
-            enSequence = false;
-            
-            document.getElementById('score-simon').textContent = niveau;
-            document.getElementById('feedback-simon').textContent = 'Préparez-vous...';
-            
-            // Démarrer automatiquement après un court délai
-            setTimeout(demarrerSimon, 1000);
+
+        function updateMemoryDisplay() {
+            document.getElementById('memory-attempts').textContent = memoryGame.attempts;
+            document.getElementById('memory-pairs').textContent = memoryGame.pairs;
         }
-        
-        /**
-         * Démarrer une nouvelle séquence
-         */
-        function demarrerSimon() {
-            if (enSequence) return;
-            enSequence = true;
-            sequence = [];
-            sequenceJoueur = [];
-            peutJouer = false;
-            niveau = 0;
-            ajouterSequence();
+
+        // =============================================
+        // JEU 2: SIMON MUSICAL
+        // =============================================
+
+        let simonGame = {
+            sequence: [],
+            playerSequence: [],
+            canPlay: false,
+            level: 0,
+            streak: 0,
+            isPlaying: false
+        };
+
+        function initSimonGame() {
+            simonGame.sequence = [];
+            simonGame.playerSequence = [];
+            simonGame.canPlay = false;
+            simonGame.level = 0;
+            simonGame.streak = 0;
+            simonGame.isPlaying = false;
+            
+            updateSimonDisplay();
+            showFeedback('Préparez-vous... La séquence va commencer !', 'neutral');
+            
+            setTimeout(addToSequence, 1500);
         }
-        
-        /**
-         * Ajoute une nouvelle couleur à la séquence
-         */
-        function ajouterSequence() {
-            peutJouer = false;
-            niveau++;
-            sequenceJoueur = [];
+
+        function addToSequence() {
+            simonGame.canPlay = false;
+            simonGame.level++;
+            simonGame.playerSequence = [];
             
-            document.getElementById('score-simon').textContent = niveau;
-            document.getElementById('feedback-simon').textContent = 'Mémorisez la séquence...';
+            updateSimonDisplay();
+            showFeedback('Mémorisez la séquence...', 'neutral');
             
-            // Ajouter une couleur aléatoire
-            const couleurs = ['rouge', 'bleu', 'vert', 'jaune'];
-            sequence.push(couleurs[Math.floor(Math.random() * couleurs.length)]);
+            const colors = ['red', 'blue', 'green', 'yellow'];
+            simonGame.sequence.push(colors[Math.floor(Math.random() * colors.length)]);
             
-            // Jouer la séquence
-            jouerSequence(0);
+            playSequence();
         }
-        
-        /**
-         * Joue la séquence couleur par couleur avec un timing régulier
-         * @param {number} index - Index de la couleur à jouer
-         */
-        function jouerSequence(index) {
-            if(index >= sequence.length) {
-                peutJouer = true;
-                enSequence = false;
-                document.getElementById('feedback-simon').textContent = 'À votre tour !';
-                return;
-            }
+
+        function playSequence() {
+            simonGame.isPlaying = true;
+            let index = 0;
             
-            const couleur = sequence[index];
-            const bouton = document.querySelector(`.btn-simon[data-couleur="${couleur}"]`);
+            const interval = setInterval(() => {
+                if (index >= simonGame.sequence.length) {
+                    clearInterval(interval);
+                    simonGame.canPlay = true;
+                    simonGame.isPlaying = false;
+                    showFeedback('À votre tour ! Reproduisez la séquence.', 'encouragement');
+                    return;
+                }
+                
+                const color = simonGame.sequence[index];
+                const button = document.querySelector(`.simon-${color}`);
+                
+                button.classList.add('active');
+                audioManager.playSimonTone(color);
+                
+                setTimeout(() => {
+                    button.classList.remove('active');
+                }, 600);
+                
+                index++;
+            }, 1000);
+        }
+
+        function playerSequence(color) {
+            if (!simonGame.canPlay || simonGame.isPlaying) return;
             
-            // Calculer le délai avant l'activation
-            const activationDelay = index * 1000;
+            const button = document.querySelector(`.simon-${color}`);
+            button.classList.add('active');
+            audioManager.playSimonTone(color);
             
             setTimeout(() => {
-                // Activer le bouton et jouer le son
-                bouton.classList.add('active');
-                jouerTone(couleur);
-                
-                // Désactiver après un temps fixe
-                setTimeout(() => {
-                    bouton.classList.remove('active');
-                    
-                    // Passer à la prochaine couleur après un délai fixe
-                    if (index + 1 < sequence.length) {
-                        jouerSequence(index + 1);
-                    } else {
-                        peutJouer = true;
-                        enSequence = false;
-                        document.getElementById('feedback-simon').textContent = 'À votre tour !';
-                    }
-                }, 500); // Temps d'activation fixe (500ms)
-            }, activationDelay); // Intervalle régulier de 1000ms entre chaque couleur
-        }
-        
-        /**
-         * Vérifie la séquence du joueur
-         * @param {string} couleur - Couleur sélectionnée
-         */
-        function verifierSequence(couleur) {
-            if(!peutJouer || enSequence) return;
+                button.classList.remove('active');
+            }, 200);
             
-            sequenceJoueur.push(couleur);
-            const bouton = document.querySelector(`.btn-simon[data-couleur="${couleur}"]`);
-            
-            // Animation de sélection
-            bouton.classList.add('active');
-            jouerTone(couleur);  // Jouer un son pour la couleur sélectionnée
-            setTimeout(() => bouton.classList.remove('active'), 200);
+            simonGame.playerSequence.push(color);
             
             // Vérifier la séquence
-            for(let i = 0; i < sequenceJoueur.length; i++) {
-                if(sequenceJoueur[i] !== sequence[i]) {
+            for (let i = 0; i < simonGame.playerSequence.length; i++) {
+                if (simonGame.playerSequence[i] !== simonGame.sequence[i]) {
                     // Erreur
-                    document.getElementById('feedback-simon').textContent = 'Séquence incorrecte. Recommencez !';
-                    setTimeout(() => {
-                        initialiserSimon();
-                    }, 1500);
+                    audioManager.playError();
+                    showFeedback('Oups ! Recommençons depuis le début.', 'encouragement');
+                    
+                    const score = simonGame.level - 1;
+                    gameStats.incrementGames('simonGame');
+                    const isNewRecord = gameStats.updateBestScore('simonGame', score);
+                    
+                    if (isNewRecord && score > 0) {
+                        setTimeout(() => {
+                            showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                            createConfetti();
+                        }, 2000);
+                    }
+                    
+                    setTimeout(initSimonGame, 2000);
                     return;
                 }
             }
             
             // Si la séquence est complète
-            if(sequenceJoueur.length === sequence.length) {
-                document.getElementById('feedback-simon').textContent = 'Bravo ! Séquence suivante...';
-                setTimeout(ajouterSequence, 1000);
+            if (simonGame.playerSequence.length === simonGame.sequence.length) {
+                simonGame.streak++;
+                updateSimonDisplay();
+                showFeedback('🎉 Parfait ! Séquence suivante...', 'success');
+                setTimeout(addToSequence, 1500);
             }
         }
-        
-        // ==================================================================
-        // JEU 3 - OBJET DISPARU
-        // ==================================================================
-        
-        let objets = [];
-        let objetManquant = null;
-        let bonnesReponses = 0;
-        let enMemo = false;
-        
-        // Liste d'objets (emojis)
-        const tousObjets = ['⌚', '📱', '🔑', '💡', '📷', '📘', '🎧', '✂️', '🧦', '🧢'];
-        
-        /**
-         * Initialise le jeu de l'objet disparu
-         */
-        function initialiserObjet() {
-            objets = [];
-            objetManquant = null;
-            bonnesReponses = 0;
-            enMemo = true;
-            
-            document.getElementById('score-objet').textContent = bonnesReponses;
-            document.getElementById('feedback-objet').textContent = '';
-            document.getElementById('selection-objets').innerHTML = '';
-            document.getElementById('selection-objets').style.display = 'none';
-            
-            afficherObjets();
+
+        function updateSimonDisplay() {
+            document.getElementById('simon-level').textContent = simonGame.level;
+            document.getElementById('simon-streak').textContent = simonGame.streak;
         }
-        
-        /**
-         * Affiche les objets à mémoriser
-         */
-        function afficherObjets() {
-            const grille = document.getElementById('grille-objets');
-            grille.innerHTML = '';
+
+        // =============================================
+        // JEU 3: SÉQUENCES NUMÉRIQUES
+        // =============================================
+
+        let sequenceGame = {
+            sequence: [],
+            playerSequence: [],
+            level: 1,
+            score: 0,
+            canPlay: false,
+            numbers: []
+        };
+
+        function initSequenceGame() {
+            sequenceGame.sequence = [];
+            sequenceGame.playerSequence = [];
+            sequenceGame.level = 1;
+            sequenceGame.score = 0;
+            sequenceGame.canPlay = false;
+            sequenceGame.numbers = [];
             
-            // Choisir 6 objets aléatoires
-            let objetsAleatoires = [...tousObjets];
-            objetsAleatoires.sort(() => Math.random() - 0.5);
-            objets = objetsAleatoires.slice(0, 6);
+            updateSequenceDisplay();
+            generateSequence();
+        }
+
+        function generateSequence() {
+            const grid = document.getElementById('sequence-grid');
+            grid.innerHTML = '';
             
-            // Choisir un objet à faire disparaître
-            objetManquant = objets[Math.floor(Math.random() * objets.length)];
+            sequenceGame.canPlay = false;
+            sequenceGame.playerSequence = [];
             
-            // Afficher tous les objets
-            objets.forEach(objet => {
-                const element = document.createElement('div');
-                element.classList.add('objet');
-                element.textContent = objet;
-                grille.appendChild(element);
+            // Générer une séquence de nombres
+            const sequenceLength = Math.min(2 + sequenceGame.level, 8);
+            sequenceGame.sequence = [];
+            sequenceGame.numbers = [];
+            
+            // Créer des nombres uniques
+            for (let i = 1; i <= 10; i++) {
+                sequenceGame.numbers.push(i);
+            }
+            sequenceGame.numbers.sort(() => Math.random() - 0.5);
+            
+            // Sélectionner la séquence à mémoriser
+            for (let i = 0; i < sequenceLength; i++) {
+                sequenceGame.sequence.push(sequenceGame.numbers[i]);
+            }
+            
+            // Créer les éléments visuels
+            sequenceGame.numbers.slice(0, 8).forEach((number, index) => {
+                const item = document.createElement('div');
+                item.classList.add('sequence-item');
+                item.textContent = number;
+                item.dataset.number = number;
+                item.addEventListener('click', () => selectNumber(number));
+                grid.appendChild(item);
             });
             
-            document.getElementById('feedback-objet').textContent = 'Mémorisez les objets...';
-            enMemo = true;
+            showFeedback(`Niveau ${sequenceGame.level} - Mémorisez cette séquence !`, 'neutral');
             
-            // Après 7 secondes, cacher un objet
-            setTimeout(cacherObjet, 7000);
+            // Afficher la séquence
+            showSequence();
         }
-        
-        /**
-         * Cache un objet et demande au joueur de l'identifier
-         */
-        function cacherObjet() {
-            const grille = document.getElementById('grille-objets');
-            grille.innerHTML = '';
+
+        function showSequence() {
+            let index = 0;
             
-            // Créer des boutons pour les objets originaux
-            const selectionContainer = document.getElementById('selection-objets');
-            selectionContainer.innerHTML = '';
-            selectionContainer.style.display = 'grid';
-            
-            objets.forEach(objet => {
-                if (objet !== objetManquant) {
-                    const element = document.createElement('div');
-                    element.classList.add('objet');
-                    element.textContent = objet;
-                    grille.appendChild(element);
+            const interval = setInterval(() => {
+                // Enlever la surbrillance précédente
+                document.querySelectorAll('.sequence-item').forEach(item => {
+                    item.classList.remove('highlighted');
+                });
+                
+                if (index >= sequenceGame.sequence.length) {
+                    clearInterval(interval);
+                    sequenceGame.canPlay = true;
+                    showFeedback('Maintenant, cliquez sur les nombres dans le bon ordre !', 'encouragement');
+                    return;
                 }
                 
-                const bouton = document.createElement('button');
-                bouton.classList.add('btn-objet');
-                bouton.textContent = objet;
-                bouton.onclick = () => verifierObjet(objet);
-                selectionContainer.appendChild(bouton);
-            });
-            
-            document.getElementById('feedback-objet').textContent = 'Quel objet a disparu ?';
-            enMemo = false;
+                // Mettre en surbrillance le nombre actuel
+                const number = sequenceGame.sequence[index];
+                const item = document.querySelector(`[data-number="${number}"]`);
+                if (item) {
+                    item.classList.add('highlighted');
+                }
+                
+                index++;
+            }, 1000);
         }
-        
-        /**
-         * Vérifie la réponse du joueur
-         * @param {string} choix - Objet sélectionné
-         */
-        function verifierObjet(choix) {
-            if (enMemo) return;
+
+        function selectNumber(number) {
+            if (!sequenceGame.canPlay) return;
             
-            if(choix === objetManquant) {
-                bonnesReponses++;
-                document.getElementById('score-objet').textContent = bonnesReponses;
-                document.getElementById('feedback-objet').textContent = 'Bravo ! Bonne réponse.';
-            } else {
-                document.getElementById('feedback-objet').textContent = `Dommage ! L'objet manquant était: ${objetManquant}`;
+            sequenceGame.playerSequence.push(number);
+            
+            // Vérifier si c'est correct
+            const currentIndex = sequenceGame.playerSequence.length - 1;
+            if (sequenceGame.playerSequence[currentIndex] !== sequenceGame.sequence[currentIndex]) {
+                // Erreur
+                audioManager.playError();
+                showFeedback('Ce n\'est pas le bon ordre. Nouvelle séquence !', 'encouragement');
+                
+                gameStats.incrementGames('sequenceGame');
+                const isNewRecord = gameStats.updateBestScore('sequenceGame', sequenceGame.score);
+                
+                if (isNewRecord && sequenceGame.score > 0) {
+                    setTimeout(() => {
+                        showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                        createConfetti();
+                    }, 2000);
+                }
+                
+                setTimeout(() => {
+                    sequenceGame.level = Math.max(1, sequenceGame.level - 1);
+                    generateSequence();
+                }, 2000);
+                return;
             }
             
-            // Nouvelle manche après 2 secondes
-            setTimeout(afficherObjets, 2000);
+            // Si la séquence est complète
+            if (sequenceGame.playerSequence.length === sequenceGame.sequence.length) {
+                sequenceGame.score += sequenceGame.level * 10;
+                sequenceGame.level++;
+                updateSequenceDisplay();
+                
+                audioManager.playSuccess();
+                showFeedback('🎉 Excellent ! Niveau suivant !', 'success');
+                
+                setTimeout(generateSequence, 1500);
+            }
         }
-        
-        // Initialiser le menu au chargement
-        window.onload = () => {
-            initialiserMemo();
+
+        function updateSequenceDisplay() {
+            document.getElementById('sequence-level').textContent = sequenceGame.level;
+            document.getElementById('sequence-score').textContent = sequenceGame.score;
+        }
+
+        // =============================================
+        // JEU 4: OBJET DISPARU
+        // =============================================
+
+        let objectsGame = {
+            objects: [],
+            missingObject: null,
+            round: 1,
+            score: 0,
+            isMemorizing: false,
+            allObjects: ['⌚', '📱', '🔑', '💡', '📷', '📘', '🎧', '✂️', '🧦', '🧢', '🎯', '🎨', '🔍', '📌']
         };
+
+        function initObjectsGame() {
+            objectsGame.objects = [];
+            objectsGame.missingObject = null;
+            objectsGame.round = 1;
+            objectsGame.score = 0;
+            objectsGame.isMemorizing = false;
+            
+            updateObjectsDisplay();
+            showObjects();
+        }
+
+        function showObjects() {
+            const grid = document.getElementById('objects-grid');
+            const choices = document.getElementById('objects-choices');
+            grid.innerHTML = '';
+            choices.innerHTML = '';
+            choices.style.display = 'none';
+            
+            // Choisir 6 objets aléatoires
+            let availableObjects = [...objectsGame.allObjects];
+            availableObjects.sort(() => Math.random() - 0.5);
+            objectsGame.objects = availableObjects.slice(0, 6);
+            
+            // Choisir l'objet qui va disparaître
+            objectsGame.missingObject = objectsGame.objects[Math.floor(Math.random() * objectsGame.objects.length)];
+            
+            // Afficher tous les objets
+            objectsGame.objects.forEach(obj => {
+                const item = document.createElement('div');
+                item.classList.add('object-item');
+                item.textContent = obj;
+                grid.appendChild(item);
+            });
+            
+            showFeedback(`Manche ${objectsGame.round} - Mémorisez ces objets...`, 'neutral');
+            objectsGame.isMemorizing = true;
+            
+            // Après 5 secondes, cacher un objet
+            setTimeout(hideObject, 5000);
+        }
+
+        function hideObject() {
+            const grid = document.getElementById('objects-grid');
+            const choices = document.getElementById('objects-choices');
+            
+            grid.innerHTML = '';
+            choices.innerHTML = '';
+            choices.style.display = 'grid';
+            
+            // Afficher les objets sauf celui qui manque
+            objectsGame.objects.forEach(obj => {
+                if (obj !== objectsGame.missingObject) {
+                    const item = document.createElement('div');
+                    item.classList.add('object-item');
+                    item.textContent = obj;
+                    grid.appendChild(item);
+                }
+            });
+            
+            // Créer les boutons de choix
+            objectsGame.objects.forEach(obj => {
+                const button = document.createElement('div');
+                button.classList.add('object-item', 'selectable');
+                button.textContent = obj;
+                button.addEventListener('click', () => checkAnswer(obj));
+                choices.appendChild(button);
+            });
+            
+            showFeedback('Quel objet a disparu ? Cliquez dessus !', 'encouragement');
+            objectsGame.isMemorizing = false;
+        }
+
+        function checkAnswer(selectedObject) {
+            if (objectsGame.isMemorizing) return;
+            
+            if (selectedObject === objectsGame.missingObject) {
+                // Bonne réponse
+                objectsGame.score += 10;
+                objectsGame.round++;
+                updateObjectsDisplay();
+                
+                audioManager.playSuccess();
+                showFeedback('🎉 Bravo ! Bonne réponse !', 'success');
+                
+                gameStats.incrementGames('objectsGame');
+                const isNewRecord = gameStats.updateBestScore('objectsGame', objectsGame.score);
+                
+                if (isNewRecord) {
+                    setTimeout(() => {
+                        showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                        createConfetti();
+                    }, 2000);
+                }
+                
+                setTimeout(showObjects, 2000);
+            } else {
+                // Mauvaise réponse
+                audioManager.playError();
+                showFeedback(`L'objet manquant était: ${objectsGame.missingObject}. Nouvelle manche !`, 'encouragement');
+                
+                setTimeout(showObjects, 3000);
+            }
+        }
+
+        function updateObjectsDisplay() {
+            document.getElementById('objects-round').textContent = objectsGame.round;
+            document.getElementById('objects-score').textContent = objectsGame.score;
+        }
+
+        // =============================================
+        // INITIALISATION
+        // =============================================
+
+        // Initialiser l'application au chargement
+        window.addEventListener('load', () => {
+            gameStats.updateDisplay();
+        });
     </script>
 </body>
 </html>

@@ -354,6 +354,10 @@
         <section id="suite-sonore">
             <h2>Suite Sonore</h2>
             <div class="score">Séquence: <span id="score-simon">0</span></div>
+            <div id="audio-activation" style="margin: 20px 0; text-align: center;">
+                <button class="btn" onclick="activerSon()" id="btn-activer-son">🔊 Activer le Son</button>
+                <p style="font-size: 14px; color: #666; margin-top: 10px;">Cliquez pour activer l'audio</p>
+            </div>
             <div class="grille-simon">
                 <button class="btn-simon" data-couleur="rouge" onclick="verifierSequence('rouge')"></button>
                 <button class="btn-simon" data-couleur="bleu" onclick="verifierSequence('bleu')"></button>
@@ -387,6 +391,9 @@
          * @param {string} jeuId - ID de la section du jeu à afficher
          */
         function changerJeu(jeuId) {
+            // Initialiser l'audio dès la première interaction
+            initialiserAudio();
+            
             // Cacher toutes les sections
             document.querySelectorAll('section').forEach(section => {
                 section.classList.remove('active');
@@ -397,18 +404,73 @@
             
             // Initialiser le jeu si nécessaire
             if(jeuId === 'memo-visuel') initialiserMemo();
-            if(jeuId === 'suite-sonore') initialiserSimon();
+            if(jeuId === 'suite-sonore') {
+                initialiserAudio(); // S'assurer que l'audio est prêt pour Simon
+                initialiserSimon();
+            }
             if(jeuId === 'objet-disparu') initialiserObjet();
         }
         
         // Créer un contexte audio pour les sons
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let audioContext = null;
+        
+        // Initialiser le contexte audio après interaction utilisateur
+        function initialiserAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+        
+        /**
+         * Active explicitement le son après interaction utilisateur
+         */
+        function activerSon() {
+            initialiserAudio();
+            
+            // Test audio pour confirmer que ça fonctionne
+            if (audioContext) {
+                try {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 440; // La 440Hz
+                    gainNode.gain.value = 0.1;
+                    
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                    
+                    setTimeout(() => {
+                        oscillator.stop();
+                    }, 300);
+                    
+                    // Cacher le bouton d'activation et afficher confirmation
+                    document.getElementById('audio-activation').style.display = 'none';
+                    document.getElementById('feedback-simon').textContent = '🔊 Son activé ! Préparez-vous...';
+                    
+                } catch (error) {
+                    console.log('Erreur activation audio:', error);
+                    document.getElementById('feedback-simon').textContent = 'Erreur audio, mais le jeu reste jouable';
+                }
+            }
+        }
         
         /**
          * Joue un son pour le jeu Simon
          * @param {string} couleur - Couleur pour laquelle jouer le son
          */
         function jouerTone(couleur) {
+            // Initialiser l'audio si nécessaire
+            initialiserAudio();
+            
+            if (!audioContext) return;
+            
             const frequences = {
                 rouge: 329.63,   // E4
                 bleu: 261.63,    // C4
@@ -416,22 +478,26 @@
                 jaune: 523.25     // C5
             };
             
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.value = frequences[couleur];
-            gainNode.gain.value = 0.3;
-            
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
-            
-            setTimeout(() => {
-                oscillator.stop();
-            }, 500);
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = frequences[couleur];
+                gainNode.gain.value = 0.3;
+                
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+                
+                setTimeout(() => {
+                    oscillator.stop();
+                }, 500);
+            } catch (error) {
+                console.log('Erreur audio:', error);
+            }
         }
         
         // ==================================================================

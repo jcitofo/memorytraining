@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Mémoire - Jeux Cognitifs Accessibles</title>
+    <style>
+        /* Variables CSS pour la cohérence des couleurs */
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #45B7D1;
+            --success: #96CEB4;
+            --warning: #FFEAA7;
+            --info: #74B9FF;
+            --light: #F8F9FA;
+            --dark: #2D3436;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 8px 25px rgba(0,0,0,0.15);
+            --shadow-hover: 0 12px 35px rgba(0,0,0,0.25);
+            --border-radius: 20px;
+            --font-size-base: 18px;
+            --font-size-large: 24px;
+            --font-size-xlarge: 32px;
+            --font-size-title: 28px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset et base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* Conteneur principal */
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header avec animations */
+        .app-header {
+            background: var(--gradient-card);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .app-title {
+            font-size: var(--font-size-xlarge);
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .app-subtitle {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Navigation et sections */
+        .game-section {
+            display: none;
+            padding: 40px 30px;
+            text-align: center;
+            min-height: 500px;
+        }
+
+        .game-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: var(--font-size-title);
+            color: var(--dark);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* Système de statistiques et scores */
+        .stats-container {
+            background: linear-gradient(135deg, var(--light) 0%, #e3f2fd 100%);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-large);
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--dark);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Boutons avec animations améliorées */
+        .btn {
+            display: inline-block;
+            padding: 18px 35px;
+            margin: 10px;
+            border: none;
+            border-radius: 50px;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+            text-align: center;
+            outline: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-primary {
+            background: var(--gradient-card);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fdcb6e 100%);
+            color: var(--dark);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            margin-top: 20px;
+        }
+
+        /* Grilles de jeu adaptatives */
+        .game-grid {
+            display: grid;
+            gap: 15px;
+            margin: 30px auto;
+            justify-content: center;
+        }
+
+        .memory-grid {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 400px;
+        }
+
+        .simon-grid {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 300px;
+        }
+
+        .sequence-grid {
+            grid-template-columns: repeat(5, 1fr);
+            max-width: 500px;
+        }
+
+        .object-grid {
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 360px;
+        }
+
+        /* Cartes de mémoire */
+        .memory-card {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--border-radius);
+            background: var(--gradient-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            cursor: pointer;
+            transition: var(--transition);
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .memory-card.flipped {
+            background: white;
+            border: 3px solid var(--primary);
+            transform: rotateY(180deg);
+        }
+
+        .memory-card:hover:not(.flipped) {
+            transform: scale(1.05) rotateY(10deg);
+        }
+
+        /* Boutons Simon avec effets visuels */
+        .simon-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .simon-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
+        }
+
+        .simon-btn:hover::after {
+            width: 100%;
+            height: 100%;
+        }
+
+        .simon-btn.active {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .simon-red { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .simon-blue { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); }
+        .simon-green { background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%); }
+        .simon-yellow { background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%); }
+
+        /* Séquences de nombres */
+        .sequence-item {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--border-radius);
+            background: var(--gradient-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-large);
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .sequence-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .sequence-item.highlighted {
+            background: var(--gradient-card);
+            transform: scale(1.1);
+        }
+
+        /* Objets du jeu de disparition */
+        .object-item {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--border-radius);
+            background: white;
+            border: 3px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .object-item.selectable {
+            cursor: pointer;
+        }
+
+        .object-item.selectable:hover {
+            background: var(--secondary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Messages de feedback améliorés */
+        .feedback {
+            font-size: var(--font-size-large);
+            margin: 25px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, var(--success) 0%, #81c784 100%);
+            color: white;
+            animation: pulse 1s;
+        }
+
+        .feedback.encouragement {
+            background: linear-gradient(135deg, var(--info) 0%, #42a5f5 100%);
+            color: white;
+        }
+
+        .feedback.neutral {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Accessibilité renforcée */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .focus-visible:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Instructions claires */
+        .instructions {
+            background: rgba(116, 185, 255, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        /* Responsive design optimisé */
+        @media (max-width: 768px) {
+            .app-container {
+                margin: 10px;
+            }
+            
+            .game-section {
+                padding: 30px 20px;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 300px;
+            }
+            
+            .memory-card {
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
+            }
+            
+            .simon-btn {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .btn {
+                min-width: 180px;
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            .object-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 240px;
+            }
+            
+            .sequence-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 300px;
+            }
+        }
+
+        /* Indicateurs de progression */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Animations de confettis pour les succès */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">🧠 Entraînement Mémoire</h1>
+            <p class="app-subtitle">Jeux cognitifs adaptés et bienveillants</p>
+        </header>
+
+        <!-- Statistiques globales -->
+        <section id="global-stats" class="game-section active">
+            <h2 class="section-title">Tableau de Bord</h2>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-games">0</span>
+                    <div class="stat-label">Parties jouées</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-memory-score">0</span>
+                    <div class="stat-label">Meilleur score - Mémoire</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-simon-score">0</span>
+                    <div class="stat-label">Meilleur score - Simon</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-sequence-score">0</span>
+                    <div class="stat-label">Meilleur score - Séquence</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="best-objects-score">0</span>
+                    <div class="stat-label">Meilleur score - Objets</div>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <strong>Bienvenue !</strong><br>
+                Choisissez un jeu ci-dessous pour commencer votre entraînement mémoire. 
+                Chaque jeu est conçu pour être amusant et stimulant, sans jamais être frustrant.
+            </div>
+
+            <button class="btn btn-primary" onclick="showGame('memory-game')">
+                🃏 Jeu de Mémoire Visuelle
+            </button>
+            <button class="btn btn-primary" onclick="showGame('simon-game')">
+                🎵 Simon Musical
+            </button>
+            <button class="btn btn-primary" onclick="showGame('sequence-game')">
+                🔢 Séquences Numériques
+            </button>
+            <button class="btn btn-primary" onclick="showGame('objects-game')">
+                👁️ Objet Disparu
+            </button>
+            
+            <button class="btn btn-reset" onclick="resetAllData()">
+                🔄 Remise à Zéro Complète
+            </button>
+        </section>
+
+        <!-- Jeu 1: Mémoire Visuelle -->
+        <section id="memory-game" class="game-section">
+            <h2 class="section-title">🃏 Jeu de Mémoire Visuelle</h2>
+            
+            <div class="instructions">
+                Trouvez toutes les paires en retournant les cartes. Prenez votre temps !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="memory-attempts">0</span>
+                    <div class="stat-label">Tentatives</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="memory-pairs">0</span>
+                    <div class="stat-label">Paires trouvées</div>
+                </div>
+            </div>
+
+            <div class="game-grid memory-grid" id="memory-grid"></div>
+            
+            <div class="feedback neutral" id="memory-feedback">
+                Retournez deux cartes pour commencer !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initMemoryGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 2: Simon Musical -->
+        <section id="simon-game" class="game-section">
+            <h2 class="section-title">🎵 Simon Musical</h2>
+            
+            <div class="instructions">
+                Écoutez et reproduisez la séquence de couleurs et de sons !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="simon-level">0</span>
+                    <div class="stat-label">Niveau actuel</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="simon-streak">0</span>
+                    <div class="stat-label">Séquences réussies</div>
+                </div>
+            </div>
+
+            <div class="game-grid simon-grid" id="simon-grid">
+                <button class="simon-btn simon-red" data-color="red" onclick="playerSequence('red')"></button>
+                <button class="simon-btn simon-blue" data-color="blue" onclick="playerSequence('blue')"></button>
+                <button class="simon-btn simon-green" data-color="green" onclick="playerSequence('green')"></button>
+                <button class="simon-btn simon-yellow" data-color="yellow" onclick="playerSequence('yellow')"></button>
+            </div>
+            
+            <div class="feedback neutral" id="simon-feedback">
+                Prêt à commencer ? Cliquez sur "Nouvelle Partie" !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initSimonGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 3: Séquences Numériques -->
+        <section id="sequence-game" class="game-section">
+            <h2 class="section-title">🔢 Séquences Numériques</h2>
+            
+            <div class="instructions">
+                Mémorisez la séquence de nombres qui s'affiche, puis cliquez dans le bon ordre !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="sequence-level">1</span>
+                    <div class="stat-label">Niveau</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="sequence-score">0</span>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <div class="game-grid sequence-grid" id="sequence-grid"></div>
+            
+            <div class="feedback neutral" id="sequence-feedback">
+                Observez bien la séquence qui va s'afficher !
+            </div>
+
+            <button class="btn btn-secondary" onclick="initSequenceGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+
+        <!-- Jeu 4: Objet Disparu -->
+        <section id="objects-game" class="game-section">
+            <h2 class="section-title">👁️ Objet Disparu</h2>
+            
+            <div class="instructions">
+                Mémorisez les objets affichés, puis trouvez celui qui a disparu !
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="objects-round">1</span>
+                    <div class="stat-label">Manche</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="objects-score">0</span>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+
+            <div class="game-grid object-grid" id="objects-grid"></div>
+            
+            <div class="feedback neutral" id="objects-feedback">
+                Mémorisez bien tous les objets...
+            </div>
+
+            <div class="game-grid object-grid" id="objects-choices" style="display: none;"></div>
+
+            <button class="btn btn-secondary" onclick="initObjectsGame()">
+                🔄 Nouvelle Partie
+            </button>
+            <button class="btn btn-warning" onclick="showGame('global-stats')">
+                ⬅️ Retour au Menu
+            </button>
+        </section>
+    </div>
+
+    <script>
+        // =============================================
+        // GESTION DES DONNÉES ET STATISTIQUES
+        // =============================================
+
+        class GameStats {
+            constructor() {
+                this.loadStats();
+            }
+
+            loadStats() {
+                const saved = localStorage.getItem('memoryGameStats');
+                if (saved) {
+                    Object.assign(this, JSON.parse(saved));
+                } else {
+                    this.totalGames = 0;
+                    this.memoryGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.simonGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.sequenceGame = { bestScore: 0, gamesPlayed: 0 };
+                    this.objectsGame = { bestScore: 0, gamesPlayed: 0 };
+                }
+                this.updateDisplay();
+            }
+
+            saveStats() {
+                localStorage.setItem('memoryGameStats', JSON.stringify(this));
+                this.updateDisplay();
+            }
+
+            updateBestScore(game, score) {
+                if (score > this[game].bestScore) {
+                    this[game].bestScore = score;
+                    this.saveStats();
+                    return true; // Nouveau record
+                }
+                return false;
+            }
+
+            incrementGames(game) {
+                this[game].gamesPlayed++;
+                this.totalGames++;
+                this.saveStats();
+            }
+
+            updateDisplay() {
+                document.getElementById('total-games').textContent = this.totalGames;
+                document.getElementById('best-memory-score').textContent = this.memoryGame.bestScore;
+                document.getElementById('best-simon-score').textContent = this.simonGame.bestScore;
+                document.getElementById('best-sequence-score').textContent = this.sequenceGame.bestScore;
+                document.getElementById('best-objects-score').textContent = this.objectsGame.bestScore;
+            }
+
+            reset() {
+                localStorage.removeItem('memoryGameStats');
+                this.loadStats();
+            }
+        }
+
+        // Instance globale des statistiques
+        const gameStats = new GameStats();
+
+        // =============================================
+        // GESTION DES SONS
+        // =============================================
+
+        class AudioManager {
+            constructor() {
+                this.audioContext = null;
+                this.initAudio();
+            }
+
+            async initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio non supporté');
+                }
+            }
+
+            playTone(frequency, duration = 0.5) {
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.value = frequency;
+                gainNode.gain.value = 0.3;
+
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, this.audioContext.currentTime + duration);
+                
+                setTimeout(() => oscillator.stop(), duration * 1000);
+            }
+
+            playSuccess() {
+                this.playTone(523.25, 0.3); // C5
+                setTimeout(() => this.playTone(659.25, 0.3), 150); // E5
+                setTimeout(() => this.playTone(783.99, 0.5), 300); // G5
+            }
+
+            playError() {
+                this.playTone(200, 0.8);
+            }
+
+            playSimonTone(color) {
+                const frequencies = {
+                    red: 329.63,    // E4
+                    blue: 261.63,   // C4
+                    green: 392.00,  // G4
+                    yellow: 523.25  // C5
+                };
+                this.playTone(frequencies[color], 0.6);
+            }
+        }
+
+        const audioManager = new AudioManager();
+
+        // =============================================
+        // FONCTIONS UTILITAIRES
+        // =============================================
+
+        function showGame(gameId) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.game-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Afficher la section demandée
+            document.getElementById(gameId).classList.add('active');
+            
+            // Initialiser le jeu si nécessaire
+            if (gameId === 'memory-game') initMemoryGame();
+            if (gameId === 'simon-game') initSimonGame();
+            if (gameId === 'sequence-game') initSequenceGame();
+            if (gameId === 'objects-game') initObjectsGame();
+        }
+
+        function resetAllData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes vos statistiques et recommencer à zéro ?')) {
+                gameStats.reset();
+                showFeedback('Toutes les données ont été effacées. Bon entraînement !', 'encouragement');
+            }
+        }
+
+        function showFeedback(message, type = 'neutral') {
+            // Fonction utilitaire pour afficher des messages avec style
+            const feedback = document.querySelector('.game-section.active .feedback');
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.className = `feedback ${type}`;
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.innerHTML = '🎉';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.animation = 'confetti-fall linear forwards';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+
+        // =============================================
+        // JEU 1: MÉMOIRE VISUELLE
+        // =============================================
+
+        let memoryGame = {
+            cards: [],
+            flippedCards: [],
+            locked: false,
+            attempts: 0,
+            pairs: 0,
+            symbols: ['🍎', '🍌', '🍒', '🍑', '🍇', '🍊', '🥝', '🍓']
+        };
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            
+            memoryGame.cards = [];
+            memoryGame.flippedCards = [];
+            memoryGame.locked = false;
+            memoryGame.attempts = 0;
+            memoryGame.pairs = 0;
+            
+            updateMemoryDisplay();
+            showFeedback('Retournez deux cartes pour commencer !', 'neutral');
+            
+            // Créer les paires de symboles
+            let gameSymbols = [...memoryGame.symbols, ...memoryGame.symbols];
+            gameSymbols.sort(() => Math.random() - 0.5);
+            
+            // Créer les cartes
+            gameSymbols.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.innerHTML = '?';
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+                memoryGame.cards.push(card);
+            });
+        }
+
+        function flipCard() {
+            if (memoryGame.locked || this === memoryGame.flippedCards[0] || this.classList.contains('flipped')) return;
+            
+            this.classList.add('flipped');
+            this.innerHTML = this.dataset.symbol;
+            memoryGame.flippedCards.push(this);
+            
+            if (memoryGame.flippedCards.length === 2) {
+                memoryGame.locked = true;
+                memoryGame.attempts++;
+                updateMemoryDisplay();
+                
+                if (memoryGame.flippedCards[0].dataset.symbol === memoryGame.flippedCards[1].dataset.symbol) {
+                    // Paire trouvée
+                    memoryGame.flippedCards[0].removeEventListener('click', flipCard);
+                    memoryGame.flippedCards[1].removeEventListener('click', flipCard);
+                    memoryGame.flippedCards = [];
+                    memoryGame.locked = false;
+                    memoryGame.pairs++;
+                    updateMemoryDisplay();
+                    
+                    audioManager.playSuccess();
+                    
+                    if (memoryGame.pairs === memoryGame.symbols.length) {
+                        // Jeu terminé
+                        const score = Math.max(0, 100 - memoryGame.attempts * 5);
+                        gameStats.incrementGames('memoryGame');
+                        const isNewRecord = gameStats.updateBestScore('memoryGame', score);
+                        
+                        showFeedback(`🎉 Bravo ! Toutes les paires trouvées en ${memoryGame.attempts} tentatives !`, 'success');
+                        
+                        if (isNewRecord) {
+                            setTimeout(() => {
+                                showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                                createConfetti();
+                            }, 2000);
+                        }
+                    } else {
+                        showFeedback('✨ Excellente paire ! Continuez !', 'success');
+                    }
+                } else {
+                    // Pas une paire
+                    setTimeout(() => {
+                        memoryGame.flippedCards[0].classList.remove('flipped');
+                        memoryGame.flippedCards[1].classList.remove('flipped');
+                        memoryGame.flippedCards[0].innerHTML = '?';
+                        memoryGame.flippedCards[1].innerHTML = '?';
+                        memoryGame.flippedCards = [];
+                        memoryGame.locked = false;
+                        showFeedback('Pas tout à fait ! Essayez encore.', 'encouragement');
+                    }, 1000);
+                }
+            }
+        }
+
+        function updateMemoryDisplay() {
+            document.getElementById('memory-attempts').textContent = memoryGame.attempts;
+            document.getElementById('memory-pairs').textContent = memoryGame.pairs;
+        }
+
+        // =============================================
+        // JEU 2: SIMON MUSICAL
+        // =============================================
+
+        let simonGame = {
+            sequence: [],
+            playerSequence: [],
+            canPlay: false,
+            level: 0,
+            streak: 0,
+            isPlaying: false
+        };
+
+        function initSimonGame() {
+            simonGame.sequence = [];
+            simonGame.playerSequence = [];
+            simonGame.canPlay = false;
+            simonGame.level = 0;
+            simonGame.streak = 0;
+            simonGame.isPlaying = false;
+            
+            updateSimonDisplay();
+            showFeedback('Préparez-vous... La séquence va commencer !', 'neutral');
+            
+            setTimeout(addToSequence, 1500);
+        }
+
+        function addToSequence() {
+            simonGame.canPlay = false;
+            simonGame.level++;
+            simonGame.playerSequence = [];
+            
+            updateSimonDisplay();
+            showFeedback('Mémorisez la séquence...', 'neutral');
+            
+            const colors = ['red', 'blue', 'green', 'yellow'];
+            simonGame.sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+            
+            playSequence();
+        }
+
+        function playSequence() {
+            simonGame.isPlaying = true;
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                if (index >= simonGame.sequence.length) {
+                    clearInterval(interval);
+                    simonGame.canPlay = true;
+                    simonGame.isPlaying = false;
+                    showFeedback('À votre tour ! Reproduisez la séquence.', 'encouragement');
+                    return;
+                }
+                
+                const color = simonGame.sequence[index];
+                const button = document.querySelector(`.simon-${color}`);
+                
+                button.classList.add('active');
+                audioManager.playSimonTone(color);
+                
+                setTimeout(() => {
+                    button.classList.remove('active');
+                }, 600);
+                
+                index++;
+            }, 1000);
+        }
+
+        function playerSequence(color) {
+            if (!simonGame.canPlay || simonGame.isPlaying) return;
+            
+            const button = document.querySelector(`.simon-${color}`);
+            button.classList.add('active');
+            audioManager.playSimonTone(color);
+            
+            setTimeout(() => {
+                button.classList.remove('active');
+            }, 200);
+            
+            simonGame.playerSequence.push(color);
+            
+            // Vérifier la séquence
+            for (let i = 0; i < simonGame.playerSequence.length; i++) {
+                if (simonGame.playerSequence[i] !== simonGame.sequence[i]) {
+                    // Erreur
+                    audioManager.playError();
+                    showFeedback('Oups ! Recommençons depuis le début.', 'encouragement');
+                    
+                    const score = simonGame.level - 1;
+                    gameStats.incrementGames('simonGame');
+                    const isNewRecord = gameStats.updateBestScore('simonGame', score);
+                    
+                    if (isNewRecord && score > 0) {
+                        setTimeout(() => {
+                            showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                            createConfetti();
+                        }, 2000);
+                    }
+                    
+                    setTimeout(initSimonGame, 2000);
+                    return;
+                }
+            }
+            
+            // Si la séquence est complète
+            if (simonGame.playerSequence.length === simonGame.sequence.length) {
+                simonGame.streak++;
+                updateSimonDisplay();
+                showFeedback('🎉 Parfait ! Séquence suivante...', 'success');
+                setTimeout(addToSequence, 1500);
+            }
+        }
+
+        function updateSimonDisplay() {
+            document.getElementById('simon-level').textContent = simonGame.level;
+            document.getElementById('simon-streak').textContent = simonGame.streak;
+        }
+
+        // =============================================
+        // JEU 3: SÉQUENCES NUMÉRIQUES
+        // =============================================
+
+        let sequenceGame = {
+            sequence: [],
+            playerSequence: [],
+            level: 1,
+            score: 0,
+            canPlay: false,
+            numbers: []
+        };
+
+        function initSequenceGame() {
+            sequenceGame.sequence = [];
+            sequenceGame.playerSequence = [];
+            sequenceGame.level = 1;
+            sequenceGame.score = 0;
+            sequenceGame.canPlay = false;
+            sequenceGame.numbers = [];
+            
+            updateSequenceDisplay();
+            generateSequence();
+        }
+
+        function generateSequence() {
+            const grid = document.getElementById('sequence-grid');
+            grid.innerHTML = '';
+            
+            sequenceGame.canPlay = false;
+            sequenceGame.playerSequence = [];
+            
+            // Générer une séquence de nombres
+            const sequenceLength = Math.min(2 + sequenceGame.level, 8);
+            sequenceGame.sequence = [];
+            sequenceGame.numbers = [];
+            
+            // Créer des nombres uniques
+            for (let i = 1; i <= 10; i++) {
+                sequenceGame.numbers.push(i);
+            }
+            sequenceGame.numbers.sort(() => Math.random() - 0.5);
+            
+            // Sélectionner la séquence à mémoriser
+            for (let i = 0; i < sequenceLength; i++) {
+                sequenceGame.sequence.push(sequenceGame.numbers[i]);
+            }
+            
+            // Créer les éléments visuels
+            sequenceGame.numbers.slice(0, 8).forEach((number, index) => {
+                const item = document.createElement('div');
+                item.classList.add('sequence-item');
+                item.textContent = number;
+                item.dataset.number = number;
+                item.addEventListener('click', () => selectNumber(number));
+                grid.appendChild(item);
+            });
+            
+            showFeedback(`Niveau ${sequenceGame.level} - Mémorisez cette séquence !`, 'neutral');
+            
+            // Afficher la séquence
+            showSequence();
+        }
+
+        function showSequence() {
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                // Enlever la surbrillance précédente
+                document.querySelectorAll('.sequence-item').forEach(item => {
+                    item.classList.remove('highlighted');
+                });
+                
+                if (index >= sequenceGame.sequence.length) {
+                    clearInterval(interval);
+                    sequenceGame.canPlay = true;
+                    showFeedback('Maintenant, cliquez sur les nombres dans le bon ordre !', 'encouragement');
+                    return;
+                }
+                
+                // Mettre en surbrillance le nombre actuel
+                const number = sequenceGame.sequence[index];
+                const item = document.querySelector(`[data-number="${number}"]`);
+                if (item) {
+                    item.classList.add('highlighted');
+                }
+                
+                index++;
+            }, 1000);
+        }
+
+        function selectNumber(number) {
+            if (!sequenceGame.canPlay) return;
+            
+            sequenceGame.playerSequence.push(number);
+            
+            // Vérifier si c'est correct
+            const currentIndex = sequenceGame.playerSequence.length - 1;
+            if (sequenceGame.playerSequence[currentIndex] !== sequenceGame.sequence[currentIndex]) {
+                // Erreur
+                audioManager.playError();
+                showFeedback('Ce n\'est pas le bon ordre. Nouvelle séquence !', 'encouragement');
+                
+                gameStats.incrementGames('sequenceGame');
+                const isNewRecord = gameStats.updateBestScore('sequenceGame', sequenceGame.score);
+                
+                if (isNewRecord && sequenceGame.score > 0) {
+                    setTimeout(() => {
+                        showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                        createConfetti();
+                    }, 2000);
+                }
+                
+                setTimeout(() => {
+                    sequenceGame.level = Math.max(1, sequenceGame.level - 1);
+                    generateSequence();
+                }, 2000);
+                return;
+            }
+            
+            // Si la séquence est complète
+            if (sequenceGame.playerSequence.length === sequenceGame.sequence.length) {
+                sequenceGame.score += sequenceGame.level * 10;
+                sequenceGame.level++;
+                updateSequenceDisplay();
+                
+                audioManager.playSuccess();
+                showFeedback('🎉 Excellent ! Niveau suivant !', 'success');
+                
+                setTimeout(generateSequence, 1500);
+            }
+        }
+
+        function updateSequenceDisplay() {
+            document.getElementById('sequence-level').textContent = sequenceGame.level;
+            document.getElementById('sequence-score').textContent = sequenceGame.score;
+        }
+
+        // =============================================
+        // JEU 4: OBJET DISPARU
+        // =============================================
+
+        let objectsGame = {
+            objects: [],
+            missingObject: null,
+            round: 1,
+            score: 0,
+            isMemorizing: false,
+            allObjects: ['⌚', '📱', '🔑', '💡', '📷', '📘', '🎧', '✂️', '🧦', '🧢', '🎯', '🎨', '🔍', '📌']
+        };
+
+        function initObjectsGame() {
+            objectsGame.objects = [];
+            objectsGame.missingObject = null;
+            objectsGame.round = 1;
+            objectsGame.score = 0;
+            objectsGame.isMemorizing = false;
+            
+            updateObjectsDisplay();
+            showObjects();
+        }
+
+        function showObjects() {
+            const grid = document.getElementById('objects-grid');
+            const choices = document.getElementById('objects-choices');
+            grid.innerHTML = '';
+            choices.innerHTML = '';
+            choices.style.display = 'none';
+            
+            // Choisir 6 objets aléatoires
+            let availableObjects = [...objectsGame.allObjects];
+            availableObjects.sort(() => Math.random() - 0.5);
+            objectsGame.objects = availableObjects.slice(0, 6);
+            
+            // Choisir l'objet qui va disparaître
+            objectsGame.missingObject = objectsGame.objects[Math.floor(Math.random() * objectsGame.objects.length)];
+            
+            // Afficher tous les objets
+            objectsGame.objects.forEach(obj => {
+                const item = document.createElement('div');
+                item.classList.add('object-item');
+                item.textContent = obj;
+                grid.appendChild(item);
+            });
+            
+            showFeedback(`Manche ${objectsGame.round} - Mémorisez ces objets...`, 'neutral');
+            objectsGame.isMemorizing = true;
+            
+            // Après 5 secondes, cacher un objet
+            setTimeout(hideObject, 5000);
+        }
+
+        function hideObject() {
+            const grid = document.getElementById('objects-grid');
+            const choices = document.getElementById('objects-choices');
+            
+            grid.innerHTML = '';
+            choices.innerHTML = '';
+            choices.style.display = 'grid';
+            
+            // Afficher les objets sauf celui qui manque
+            objectsGame.objects.forEach(obj => {
+                if (obj !== objectsGame.missingObject) {
+                    const item = document.createElement('div');
+                    item.classList.add('object-item');
+                    item.textContent = obj;
+                    grid.appendChild(item);
+                }
+            });
+            
+            // Créer les boutons de choix
+            objectsGame.objects.forEach(obj => {
+                const button = document.createElement('div');
+                button.classList.add('object-item', 'selectable');
+                button.textContent = obj;
+                button.addEventListener('click', () => checkAnswer(obj));
+                choices.appendChild(button);
+            });
+            
+            showFeedback('Quel objet a disparu ? Cliquez dessus !', 'encouragement');
+            objectsGame.isMemorizing = false;
+        }
+
+        function checkAnswer(selectedObject) {
+            if (objectsGame.isMemorizing) return;
+            
+            if (selectedObject === objectsGame.missingObject) {
+                // Bonne réponse
+                objectsGame.score += 10;
+                objectsGame.round++;
+                updateObjectsDisplay();
+                
+                audioManager.playSuccess();
+                showFeedback('🎉 Bravo ! Bonne réponse !', 'success');
+                
+                gameStats.incrementGames('objectsGame');
+                const isNewRecord = gameStats.updateBestScore('objectsGame', objectsGame.score);
+                
+                if (isNewRecord) {
+                    setTimeout(() => {
+                        showFeedback('🏆 Nouveau record ! Félicitations !', 'success');
+                        createConfetti();
+                    }, 2000);
+                }
+                
+                setTimeout(showObjects, 2000);
+            } else {
+                // Mauvaise réponse
+                audioManager.playError();
+                showFeedback(`L'objet manquant était: ${objectsGame.missingObject}. Nouvelle manche !`, 'encouragement');
+                
+                setTimeout(showObjects, 3000);
+            }
+        }
+
+        function updateObjectsDisplay() {
+            document.getElementById('objects-round').textContent = objectsGame.round;
+            document.getElementById('objects-score').textContent = objectsGame.score;
+        }
+
+        // =============================================
+        // INITIALISATION
+        // =============================================
+
+        // Initialiser l'application au chargement
+        window.addEventListener('load', () => {
+            gameStats.updateDisplay();
+        });
+    </script>
+</body>
+</html>

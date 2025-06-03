@@ -1149,21 +1149,36 @@
             // Générer une séquence de nombres
             const sequenceLength = Math.min(2 + sequenceGame.level, 8);
             sequenceGame.sequence = [];
-            sequenceGame.numbers = [];
             
-            // Créer des nombres uniques
+            // Créer des nombres de 1 à 10 et sélectionner ceux pour la séquence
+            const availableNumbers = [];
             for (let i = 1; i <= 10; i++) {
-                sequenceGame.numbers.push(i);
+                availableNumbers.push(i);
             }
+            
+            // Mélanger et sélectionner les nombres pour la séquence
+            availableNumbers.sort(() => Math.random() - 0.5);
+            for (let i = 0; i < sequenceLength; i++) {
+                sequenceGame.sequence.push(availableNumbers[i]);
+            }
+            
+            // Créer la grille avec 8 nombres dans un ordre DIFFÉRENT de la séquence
+            // Prendre les nombres de la séquence plus quelques autres
+            sequenceGame.numbers = [...sequenceGame.sequence];
+            
+            // Ajouter des nombres supplémentaires si nécessaire pour avoir 8 nombres
+            let extraNumbersNeeded = 8 - sequenceGame.numbers.length;
+            for (let i = sequenceLength; i < availableNumbers.length && extraNumbersNeeded > 0; i++) {
+                sequenceGame.numbers.push(availableNumbers[i]);
+                extraNumbersNeeded--;
+            }
+            
+            // IMPORTANT: Mélanger la grille dans un ordre DIFFÉRENT de la séquence
+            // pour que l'utilisateur doive vraiment mémoriser
             sequenceGame.numbers.sort(() => Math.random() - 0.5);
             
-            // Sélectionner la séquence à mémoriser
-            for (let i = 0; i < sequenceLength; i++) {
-                sequenceGame.sequence.push(sequenceGame.numbers[i]);
-            }
-            
-            // Créer les éléments visuels
-            sequenceGame.numbers.slice(0, 8).forEach((number, index) => {
+            // Créer les éléments visuels dans cet ordre mélangé
+            sequenceGame.numbers.forEach((number, index) => {
                 const item = document.createElement('div');
                 item.classList.add('sequence-item');
                 item.textContent = number;
